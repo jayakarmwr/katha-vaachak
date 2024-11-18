@@ -133,5 +133,30 @@ const changePassword=async(req,res)=>{
         res.status(500).json({msg:"Server error"});
     }
 };
+const getProfile = async (req, res) => {
+    const { email } = req.query;
+  
+    try {
+      const user = await User.findOne({ email });
+      if (!user) {
+        return res.status(404).json({ msg: "User not found" });
+      }
+  
+      const profileData = {
+        username: user.username,
+        email: user.email,
+        memberSince: user.memberSince,
+        achievements: user.achievements,
+        storiesCreated: user.storiesCreated,
+        totalWritingTime: user.totalWritingTime,
+        favoriteGenre: user.favoriteGenre,
+      };
+  
+      res.status(200).json(profileData);
+    } catch (error) {
+      console.error("Error retrieving profile data:", error);
+      res.status(500).json({ msg: "Server error" });
+    }
+  };
 
-module.exports={login,signup,confirmPassword,changePassword};
+module.exports={login,signup,confirmPassword,changePassword,getProfile};
