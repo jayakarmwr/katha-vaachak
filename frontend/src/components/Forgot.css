@@ -1,0 +1,104 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body, html {
+    height: 100%;
+    font-family: Arial, sans-serif;
+}
+
+.container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    width: 100vw;
+    background-image: url('../assets/images/image.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+.LoginBlock {
+    width: 90%;
+    max-width: 400px;
+    background-color: rgba(255, 255, 255, 0.8); /* Increased opacity for form clarity */
+    padding: 2rem;
+    border-radius: 10px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.Login {
+    font-size: 2rem;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin-bottom: 1rem;
+    color: black;
+}
+
+.input-box {
+    margin-bottom: 1rem;
+    width: 100%;
+}
+
+.input-box input {
+    width: 100%;
+    padding: 0.8rem;
+    font-size: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+    background-color: rgba(255, 255, 255, 0.9); /* Transparent input fields */
+    color: black;
+}
+
+.input-box input:focus {
+    outline: none;
+    border: 1px solid black;
+    background-color: rgba(255, 255, 255, 1); /* Opaque when focused */
+}
+
+.forgot {
+    width: 100%;
+    text-align: left;
+    margin-bottom: 1rem;
+}
+
+.button {
+    width: 100%;
+    padding: 0.8rem;
+    background-color: rgba(128, 0, 128, 0.8); /* Slightly transparent purple */
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: background-color 0.3s ease;
+}
+
+.button:hover {
+    background-color: rgba(128, 0, 128, 1); /* Fully opaque purple on hover */
+}
+
+.register {
+    margin-top: 1rem;
+}
+
+.register p {
+    font-size: 0.9rem;
+}
+
+.register a {
+    color: rgba(128, 0, 128, 0.9);
+    text-decoration: none;
+}
+
+.register a:hover {
+    text-decoration: underline;
+}
