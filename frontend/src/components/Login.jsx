@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import {useNavigate} from 'react-router-dom';
 import axios from 'axios';
 import './Login.css';
 import image from '../assets/images/image.jpg';
@@ -6,6 +7,7 @@ import image from '../assets/images/image.jpg';
 const Login = () => {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+    const navigate=useNavigate();
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -14,6 +16,8 @@ const Login = () => {
             const data = response.data.msg; 
             if (data === 'ok') {
                 alert("Successfully logged in");
+                navigate("/");
+
             }
         } catch (error) {
             console.error("There was an error logging in", error);

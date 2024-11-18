@@ -87,28 +87,31 @@ const signup=async(req,res)=>{
         res.status(500).json({msg:"Server error"});
     }
 };
-const  confirmPassword=async(req,res)=>{
-    const{password,confirm,token}=req.body;
-    if(password!==confirm){
-        return res.status(400).json({msg:"Passwords do not match"});
-    }
-    try{
-        const decoded=jwt.verify(token,process.env.JWT_SECRET);
-        const email=decoded.email;
+const confirmPassword = async (req, res) => {
+    const { password, confirm, token } = req.body;
 
-        const hashedPassword=await bcrypt.hash(password,10);
-        const user=await User.findOneAndUpdate(
-            {email},
-            {password:hashedPassword},
-            {new:true}
-        );
-        if(!user){
-            res.status(404).json({msg:"User not found"});
+    if (password !== confirm) {
+        return res.status(400).json({ msg: "Passwords do not match" });
+    }
+
+    try {
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        const email = decoded.email;
+
+        const user = await User.findOne({ email });
+        if (!user || user.isConfirmed) {
+            return res.status(404).json({ msg: "Invalid or expired token" });
         }
-        res.status(200).json({msg:"ok"});
-    }catch(error){
-        console.error("Error updating password:",error);
-        res.status(500).json({msg:"Server error"});
+
+        const hashedPassword = await bcrypt.hash(password, 10);
+        user.password = hashedPassword;
+        user.isConfirmed = true; // Mark the user as confirmed
+        await user.save();
+
+        res.status(200).json({ msg: "Email confirmed and password set successfully." });
+    } catch (error) {
+        console.error("Error confirming email:", error);
+        res.status(500).json({ msg: "Server error" });
     }
 };
 
