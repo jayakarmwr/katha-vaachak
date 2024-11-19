@@ -1,0 +1,57 @@
+/* Container Styling */
+.profile-container {
+    display: flex;
+    justify-content: center; /* Center horizontally */
+    align-items: center; /* Center vertically */
+    height: 93vh; /* Full screen height */
+    background-color: #f7f7f7; /* Light background color */
+    width: 100vw; /* Full screen width */
+  
+}
+
+/* Profile Card Styling */
+.profile-card {
+    background-color: white;
+    border-radius: 0.75rem; /* Rounded corners */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    width: 100%; /* Take full width */
+    max-width: 1200px; /* Set max width for larger screens */
+    height: auto; /* Allow the card to adjust its height based on content */
+    display: flex;
+    flex-direction: column;
+    margin: 0; /* Remove side margins */
+}
+
+/* Header Styling */
+.profile-header {
+    background: linear-gradient(to right, #6366f1, #8b5cf6); /* Indigo to Purple Gradient */
+    padding: 2rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    border-radius: 0.75rem 0.75rem 0 0; /* Round only top corners */
+    color:white
+}
+
+/* Content Alignment Fixes */
+.stats-grid {
+    display: grid;
+    grid-template-columns: 1fr; /* Default single-column layout */
+    gap: 1.5rem;
+    padding: 2rem;
+    flex-grow: 1; /* Allow stats section to take available space */
+    width: 100%; /* Ensure grid takes full width */
+}
+
+.stats-grid.md {
+    grid-template-columns: repeat(2, 1fr); /* Two-column layout for medium+ screens */
+}
+
+/* Achievements Section */
+.achievements-container {
+    background: rgba(99, 102, 241, 0.1); /* Light Indigo overlay */
+    border-radius: 0.5rem;
+    padding: 1.5rem;
+    width: 100%; /* Full width for alignment */
+}

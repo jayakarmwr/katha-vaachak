@@ -1,6 +1,8 @@
 import React from 'react';
+import './Profile.css';
 import { useAuthStore } from '../store/authStore';
 import { User, Mail, BookOpen, Clock, Calendar, Award } from 'lucide-react';
+import Navbar from './Navbar';
 
 function Profile() {
   const user = useAuthStore((state) => state.user);
@@ -19,18 +21,21 @@ function Profile() {
   };
 
   return (
-    <div className="max-w-4xl mx-auto">
-      <div className="bg-white rounded-xl shadow-lg overflow-hidden">
+    <div>
+      <Navbar/>
+    <div className="profile-container">
+      
+      <div className="profile-card">
         {/* Header */}
-        <div className="bg-gradient-to-r from-indigo-500 to-purple-600 p-8">
+        <div className="profile-header">
           <div className="flex items-center space-x-4">
-            <div className="bg-white p-3 rounded-full">
-              <User className="h-8 w-8 text-indigo-600" />
+            <div className="profile-icon-container">
+              <User className="stat-icon" />
             </div>
             <div>
-              <h1 className="text-2xl font-bold text-white">{user?.name}</h1>
-              <div className="flex items-center space-x-2 text-indigo-100">
-                <Mail className="h-4 w-4" />
+              <h1 className="profile-name">{user?.name}</h1>
+              <div className="profile-email">
+                <Mail className="stat-icon" />
                 <span>{user?.email}</span>
               </div>
             </div>
@@ -38,50 +43,51 @@ function Profile() {
         </div>
 
         {/* Stats Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-8">
+        <div className="stats-grid md">
           <div className="space-y-6">
-            <div className="flex items-center space-x-3">
-              <BookOpen className="h-6 w-6 text-indigo-600" />
+            <div className="stat-item">
+              <BookOpen className="stat-icon" />
               <div>
-                <p className="text-sm text-gray-500">Stories Created</p>
-                <p className="text-lg font-semibold text-gray-800">{stats.storiesCreated}</p>
+                <p className="stat-label">Stories Created</p>
+                <p className="stat-value">{stats.storiesCreated}</p>
               </div>
             </div>
 
-            <div className="flex items-center space-x-3">
-              <Clock className="h-6 w-6 text-indigo-600" />
+            <div className="stat-item">
+              <Clock className="stat-icon" />
               <div>
-                <p className="text-sm text-gray-500">Total Writing Time</p>
-                <p className="text-lg font-semibold text-gray-800">{stats.totalWritingTime}</p>
+                <p className="stat-label">Total Writing Time</p>
+                <p className="stat-value">{stats.totalWritingTime}</p>
               </div>
             </div>
 
-            <div className="flex items-center space-x-3">
-              <Calendar className="h-6 w-6 text-indigo-600" />
+            <div className="stat-item">
+              <Calendar className="stat-icon" />
               <div>
-                <p className="text-sm text-gray-500">Member Since</p>
-                <p className="text-lg font-semibold text-gray-800">{stats.memberSince}</p>
+                <p className="stat-label">Member Since</p>
+                <p className="stat-value">{stats.memberSince}</p>
               </div>
             </div>
           </div>
 
           {/* Achievements */}
-          <div className="bg-gradient-overlay rounded-lg p-6">
-            <div className="flex items-center space-x-2 mb-4">
-              <Award className="h-6 w-6 text-indigo-600" />
-              <h2 className="text-lg font-semibold text-gray-800">Achievements</h2>
+          <div className="achievements-container">
+            <div className="achievements-header">
+              <Award className="stat-icon" />
+              <h2>Achievements</h2>
             </div>
-            <ul className="space-y-3">
+            <ul className="achievement-list">
               {stats.achievements.map((achievement, index) => (
-                <li key={index} className="flex items-center space-x-2">
-                  <span className="w-2 h-2 bg-indigo-600 rounded-full"></span>
-                  <span className="text-gray-700">{achievement}</span>
+                <li key={index} className="achievement-item">
+                  <span className="achievement-dot"></span>
+                  <span className="achievement-text">{achievement}</span>
                 </li>
               ))}
             </ul>
           </div>
         </div>
       </div>
+    </div>
     </div>
   );
 }

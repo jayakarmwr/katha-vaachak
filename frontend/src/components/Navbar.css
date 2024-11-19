@@ -1,0 +1,54 @@
+/* Navbar Styling */
+.navbar {
+    background-color: #4f46e5; /* Indigo color */
+    color: white;
+    padding: 1rem 0;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    background-image: none;
+  }
+  
+  .container {
+    max-width: 100%;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 1rem;
+    background-image: none;
+    height:7vh;
+  }
+  
+  .logo {
+    font-size: 1.5rem;
+    font-weight: bold;
+    text-decoration: none;
+    color: white;
+  }
+  
+  .nav-links {
+    display: flex;
+    gap: 1.5rem;
+  }
+  
+  .nav-links a,
+  .logout {
+    text-decoration: none;
+    font-size: 1rem;
+    color: white;
+    cursor: pointer;
+    transition: color 0.3s ease;
+  }
+  
+  .nav-links a:hover,
+  .logout:hover {
+    color: #f9a8d4; /* Light pink hover color */
+  }
+  
+  .logout {
+    border: none;
+    background: none;
+    font-size: 1rem;
+    color: white;
+    cursor: pointer;
+  }
+  
