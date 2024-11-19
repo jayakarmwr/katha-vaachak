@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { PenTool, Save } from 'lucide-react';
+import Navbar from './Navbar.jsx';
+import './CreateStory.css';
 
 const genres = [
   "Fantasy", "Science Fiction", "Mystery", "Romance", "Adventure",
@@ -29,56 +31,48 @@ function CreateStory() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // Handle story creation logic here
     console.log('Story created:', story);
   };
-  
+
   return (
-    <div className="max-w-4xl mx-auto">
-      <div className="bg-white rounded-xl shadow-xl p-8">
-        <div className="flex items-center space-x-4 mb-8">
+    <div>
+      <Navbar />
+    <div className="create-story-container">
+      <div className="create-story-card">
+        <div className="create-story-header">
           <PenTool className="h-8 w-8 text-indigo-600" />
-          <h1 className="text-3xl font-bold text-gray-800">Create Your Story</h1>
+          <h1>Create Your Story</h1>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-6">
+        <form onSubmit={handleSubmit} className="create-story-form">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Story Title
-            </label>
+            <label>Story Title</label>
             <input
               type="text"
               value={story.title}
               onChange={(e) => setStory({ ...story, title: e.target.value })}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
               placeholder="Enter your story title"
               required
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Main Characters
-            </label>
+            <label>Main Characters</label>
             <textarea
               value={story.characters}
               onChange={(e) => setStory({ ...story, characters: e.target.value })}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
               placeholder="Describe your main characters"
               rows={3}
               required
             />
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="create-story-grid">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Location
-              </label>
+              <label>Location</label>
               <select
                 value={story.location}
                 onChange={(e) => setStory({ ...story, location: e.target.value })}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
                 required
               >
                 <option value="">Select a location</option>
@@ -89,13 +83,10 @@ function CreateStory() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Genre
-              </label>
+              <label>Genre</label>
               <select
                 value={story.genre}
                 onChange={(e) => setStory({ ...story, genre: e.target.value })}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
                 required
               >
                 <option value="">Select a genre</option>
@@ -106,13 +97,10 @@ function CreateStory() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Theme
-              </label>
+              <label>Theme</label>
               <select
                 value={story.theme}
                 onChange={(e) => setStory({ ...story, theme: e.target.value })}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
                 required
               >
                 <option value="">Select a theme</option>
@@ -123,15 +111,13 @@ function CreateStory() {
             </div>
           </div>
 
-          <button
-            type="submit"
-            className="w-full flex items-center justify-center space-x-2 bg-indigo-600 text-white py-3 px-6 rounded-lg hover:bg-indigo-700 transition duration-200"
-          >
+          <button type="submit" className="create-story-submit">
             <Save className="h-5 w-5" />
             <span>Save Story</span>
           </button>
         </form>
       </div>
+    </div>
     </div>
   );
 }
