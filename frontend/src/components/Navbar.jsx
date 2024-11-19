@@ -5,7 +5,7 @@ import './Navbar.css'; // Import the CSS file
 function Navbar() {
   return (
     <nav className="navbar">
-      <div className="container">
+      <div className="navbar-container">
         {/* Logo Section */}
         <Link to="/" className="logo">
           Kathavaachak

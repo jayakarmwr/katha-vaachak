@@ -33,9 +33,9 @@ const Confirm = () => {
     };
 
     return (
-        <div className='container'>
-            <div className='LoginBlock'>
-                <form onSubmit={handleSubmit}>
+        <div className='confirm-container'>
+            <div className='ConfirmBlock'>
+                <form className="form3" onSubmit={handleSubmit}>
                     <h1 className='Login'>Enter New Password</h1>
                     <div className='input-box'>
                         <input 
@@ -46,7 +46,7 @@ const Confirm = () => {
                             required 
                         />
                     </div>
-                    <div className='input-box'>
+                    <div className='input-box-3'>
                         <input 
                             type='password' 
                             placeholder='Confirm Password' 

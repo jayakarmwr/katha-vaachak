@@ -33,8 +33,8 @@ const Forgot = () => {
     };
 
     return (
-        <div className='container'>
-            <div className='LoginBlock'>
+        <div className='forgot-container'>
+            <div className='ForgotBlock'>
                 <form onSubmit={handleSubmit}>
                     <h1 className='Login'>Enter New Password</h1>
                     <div className='input-box'>
@@ -46,7 +46,7 @@ const Forgot = () => {
                             required
                         />
                     </div>
-                    <div className='input-box'>
+                    <div className='input-box-2'>
                         <input
                             type='password'
                             placeholder='New Password'
@@ -55,7 +55,7 @@ const Forgot = () => {
                             required
                         />
                     </div>
-                    <div className='input-box'>
+                    <div className='input-box-2'>
                         <input
                             type='password'
                             placeholder='Confirm Password'

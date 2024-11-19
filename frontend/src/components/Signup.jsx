@@ -32,7 +32,7 @@ const Signup = () => {
   };
 
   return (
-    <div className='container-1'>
+    <div className='signup-container'>
       <div className='Signup-Block'>
         <form onSubmit={handleSubmit} className='form'>
           <h1 className='Signup'>Signup</h1>

@@ -17,7 +17,7 @@ function App() {
         <Route path="/" element={<Dashboard/>}/>
         <Route path="/login" element={<Login />}/>
         <Route path="/signup" element={<Signup />}/>
-        <Route path="/confirm-email/:token" element={<Confirm/>}/>
+        <Route path="/confirm-email" element={<Confirm/>}/>
         <Route path="/change-password" element={<Forgot/>}/>
         <Route path="/create-story" element={<CreateStory/>}/>
         <Route path="/my-stories" element={<MyStories/>}/>
