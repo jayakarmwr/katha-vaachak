@@ -1,20 +1,22 @@
-/* General reset for the body */
 body {
     margin: 0;
     padding: 0;
     font-family: 'Arial', sans-serif;
     background-color: #f3f4f6; /* Light gray background */
     display: flex;
+    flex-direction: column; /* Allow stacking of navbar and container */
     align-items: center;
-    justify-content: center;
-    min-height: 100vh; /* Full viewport height */
+    justify-content: flex-start; /* Align items from the top */
+    min-height: 100vh;
+    width: 100%; /* Full viewport width */
+    box-sizing: border-box;
 }
 
 /* Main container - Make the container wider */
 .create-story-container {
     width: 100%; /* Full width of the viewport */
     max-width: 80rem; /* Increase max-width for more space */
-    min-width: 70%;  /* Ensure it’s at least 70% of the screen width */
+    min-width: 90%;  /* Ensure it’s at least 70% of the screen width */
     margin: 0 auto;
     padding: 1.5rem; /* Add more padding for better spacing */
     box-sizing: border-box;

@@ -38,7 +38,7 @@
     overflow: hidden;
     margin-bottom: 1.5rem; /* Add gap between cards */
     width: 100%; /* Full width of the container */
-    max-width: 600px; /* Limit maximum width for a compact design */
+    max-width: 30rem; /* Limit maximum width for a compact design */
   }
   
   .story-history-content {
