@@ -16,7 +16,7 @@ const Login = () => {
             const data = response.data.msg; 
             if (data === 'ok') {
                 alert("Successfully logged in");
-                navigate("/");
+                navigate("/profile");
 
             }
         } catch (error) {

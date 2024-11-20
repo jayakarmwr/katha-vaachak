@@ -1,6 +1,7 @@
 import React from 'react';
 import { Library, Edit, Trash2 } from 'lucide-react';
 import './MyStories.css'; // Import the CSS file
+import Navbar from './Navbar';
 
 // Mock data - replace with actual data from your backend
 const mockStories = [
@@ -22,6 +23,8 @@ const mockStories = [
 
 function MyStories() {
   return (
+    <div>
+      <Navbar />
     <div className="my-stories-container">
       <div className="my-stories-header">
         <Library className="h-8 w-8 text-indigo-600" />
@@ -57,6 +60,7 @@ function MyStories() {
           <p>You haven't created any stories yet.</p>
         </div>
       )}
+    </div>
     </div>
   );
 }

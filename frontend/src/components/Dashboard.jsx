@@ -10,9 +10,9 @@ function Dashboard() {
 
   return (
     
+    <div>
+      <Navbar />
     <div className="dashboard-container">
-      
-    <Navbar />  {/* Navbar displayed above header */}
       <header className="dashboard-header">
         <h1>Welcome back, [User's Name]!</h1>
         <p>Ready to craft your next masterpiece?</p>
@@ -58,6 +58,7 @@ function Dashboard() {
           Generate Your Story
         </Link>
       </div>
+    </div>
     </div>
   );
 }
