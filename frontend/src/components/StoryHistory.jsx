@@ -18,6 +18,13 @@ const mockHistory = [
     date: "2024-03-09",
     duration: "30 minutes",
     progress: "Character development"
+  },
+  {
+    id: 2,
+    title: "Stellar Dreams",
+    date: "2024-03-09",
+    duration: "30 minutes",
+    progress: "Character development"
   }
 ];
 
