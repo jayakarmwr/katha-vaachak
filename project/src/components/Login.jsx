@@ -3,20 +3,37 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../store/authStore';
 import { BookOpen, LogIn, Mail, Lock } from 'lucide-react';
 import '../styles/Login.css';
+import axios from 'axios';
 
-export default function Login() {
-  const [credentials, setCredentials] = useState({ email: '', password: '' });
-  const navigate = useNavigate();
+const Login = () => {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const navigate=useNavigate();
+
   const login = useAuthStore((state) => state.login);
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    login({
-      id: '1',
-      name: 'Demo User',
-      email: credentials.email
-    });
-    navigate('/dashboard');
+  const handleSubmit = async (e) => {
+      e.preventDefault();
+      try {
+          const response = await axios.post("http://localhost:3000/en/getdata", { email, password });
+          const data = response.data.msg; 
+          if (data === 'ok') {
+              alert("Successfully logged in");
+              login({ email });
+              navigate("/profile");
+
+          }
+          else if(data==='User not found'){
+            alert("User not found. Please register to login");
+            navigate("/register");
+          }
+          else if (data === 'Incorrect password') {
+            alert("Incorrect password. Please try again.");
+          }
+      } catch (error) {
+          console.error("There was an error logging in", error);
+          alert("An error occurred. Please try again.");
+      }
   };
 
   return (
@@ -39,8 +56,8 @@ export default function Login() {
               <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
               <input
                 type="email"
-                value={credentials.email}
-                onChange={(e) => setCredentials({ ...credentials, email: e.target.value })}
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
                 required
               />
@@ -55,12 +72,18 @@ export default function Login() {
               <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
               <input
                 type="password"
-                value={credentials.password}
-                onChange={(e) => setCredentials({ ...credentials, password: e.target.value })}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
                 className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
                 required
               />
             </div>
+          </div>
+
+          <div className="forgot text-right mt-2">
+            <Link to="/change-password" className="text-indigo-600 hover:text-indigo-700 font-medium text-sm">
+              Forgot Password?
+            </Link>
           </div>
 
           <button type="submit" className="login-button">
@@ -81,3 +104,5 @@ export default function Login() {
     </div>
   );
 }
+
+export default Login;

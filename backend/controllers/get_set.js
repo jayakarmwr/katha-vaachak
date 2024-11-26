@@ -10,13 +10,13 @@ const login=async(req,res)=>{
     try{
         const user=await User.findOne({email});
         if(!user){
-            return res.status(404).json({msg:"User not found"});
+            return res.status(200).json({msg:"User not found"});
         }
 
         const isPasswordValid=await bcrypt.compare(password,user.password);
 
         if(!isPasswordValid){
-            return res.status(404).json({msg:"Incorrect password"});
+            return res.status(200).json({msg:"Incorrect password"});
         }
 
         res.status(200).json({msg:"ok"});
@@ -39,8 +39,10 @@ const signup=async(req,res)=>{
     const {username,email}=req.body;
     try{
         const existingUser=await User.findOne({email});
+        console.log(existingUser);
         if(existingUser){
-            return res.json({msg:"User already exists"});
+            console.log("User exixts");
+            return res.status(409).json({msg:"User already exists"});
         }
 
         const newUser=new User({

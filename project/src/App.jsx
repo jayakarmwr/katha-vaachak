@@ -9,6 +9,8 @@ import CreateStory from './components/CreateStory';
 import MyStories from './components/MyStories';
 import StoryHistory from './components/StoryHistory';
 import Profile from './components/Profile';
+import Confirm from './components/Confirm';
+import Forgot from './components/Forgot';
 
 function ProtectedRoute({ children }) {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
@@ -26,6 +28,8 @@ export default function App() {
           <Routes>
             <Route path="/login" element={!isAuthenticated ? <Login /> : <Navigate to="/dashboard" />} />
             <Route path="/register" element={!isAuthenticated ? <Register /> : <Navigate to="/dashboard" />} />
+            <Route path="/confirm-email/:token" element={<Confirm />}/>
+            <Route path="/change-password" element={<Forgot />}/>
             <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
             <Route path="/create-story" element={<ProtectedRoute><CreateStory /></ProtectedRoute>} />
             <Route path="/my-stories" element={<ProtectedRoute><MyStories /></ProtectedRoute>} />
