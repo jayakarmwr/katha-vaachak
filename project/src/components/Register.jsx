@@ -20,10 +20,6 @@ const Register=() =>{
         alert("Signup successful: " + response.data.msg);
 
       }
-      else
-      {
-        alert("Signup failed: " + response.data.msg);
-      }
       
     } catch (error) {
       console.error("There was an error signing up:", error);

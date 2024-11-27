@@ -44,9 +44,9 @@ const signup=async(req,res)=>{
             console.log("User exixts");
             return res.status(409).json({msg:"User already exists"});
         }
-
+        console.log("Creating new user...");
         const newUser=new User({
-            username,
+            username,   
             email,
         });
         await newUser.save();
@@ -76,7 +76,7 @@ const signup=async(req,res)=>{
                 </div>
                 `
         };
-        transporter.sendMail(mailOptions,(error,info)=>{
+        await transporter.sendMail(mailOptions,(error,info)=>{
             if(error){
                 console.error("Error sending email:",error);
                 return res.status(500).json({msg:"Error sending confirmation email"});
