@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { PenTool, Save } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 function CreateStory() {
   const [story, setStory] = useState({
@@ -8,10 +9,12 @@ function CreateStory() {
     plot: ''
   });
 
+  const navigate = useNavigate();
+
   const handleSubmit = (e) => {
     e.preventDefault();
-    // Handle story creation logic here
-    console.log('Story created:', story);
+    // Redirect to the StoryDisplay page with story data
+    navigate('/story-display', { state: { story } });
   };
 
   return (
@@ -74,7 +77,7 @@ function CreateStory() {
             className="w-full flex items-center justify-center space-x-2 bg-indigo-600 text-white py-3 px-6 rounded-lg hover:bg-indigo-700 transition duration-200"
           >
             <Save className="h-5 w-5" />
-            <span>Save Story</span>
+            <span>Generate Story</span>
           </button>
         </form>
       </div>

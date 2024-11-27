@@ -11,6 +11,7 @@ import StoryHistory from './components/StoryHistory';
 import Profile from './components/Profile';
 import Confirm from './components/Confirm';
 import Forgot from './components/Forgot';
+import StoryDisplay from './components/StoryDisplay';
 
 function ProtectedRoute({ children }) {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
@@ -32,6 +33,7 @@ export default function App() {
             <Route path="/change-password" element={<Forgot />}/>
             <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
             <Route path="/create-story" element={<ProtectedRoute><CreateStory /></ProtectedRoute>} />
+            <Route path="/story-display" element={<ProtectedRoute><StoryDisplay /></ProtectedRoute>} />
             <Route path="/my-stories" element={<ProtectedRoute><MyStories /></ProtectedRoute>} />
             <Route path="/story-history" element={<ProtectedRoute><StoryHistory /></ProtectedRoute>} />
             <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
