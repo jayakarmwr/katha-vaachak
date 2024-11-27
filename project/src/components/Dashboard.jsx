@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useState } from 'react';
 import {useNavigate} from 'react-router-dom';
@@ -7,28 +7,20 @@ import { useAuthStore } from '../store/authStore';
 import '../styles/Dashboard.css';
 
 export default function Dashboard() {
-  // const user = useAuthStore((state) => state.user);
-  const [user, setUser] = useState(null); // User details
-  const navigate = useNavigate();
-
+  const [user,setUser]=useState("");
   useEffect(() => {
-    // Fetch user data from session storage
-    const storedUser = sessionStorage.getItem("user");
-
-    if (!storedUser) {
-      // Redirect to login if no user data found
-      navigate("/login");
-      return;
+    const storedData = sessionStorage.getItem('user');
+    if (storedData) {
+      const userdata = JSON.parse(storedData);
+      setUser(userdata.username);
     }
-
-    // Parse and set user data
-    setUser(JSON.parse(storedUser));
-  }, [navigate]);
+  }, []); // Dependency array ensures useEffect runs only once.
+  
 
   return (
     <div className="max-w-6xl mx-auto">
       <div className="dashboard-welcome">
-        <h1 className="text-4xl font-bold mb-4">Welcome back, {user.username}!</h1>
+        <h1 className="text-4xl font-bold mb-4">Welcome back, {user.toUpperCase()}!</h1>
         <p className="text-lg text-indigo-100">Ready to craft your next masterpiece?</p>
       </div>
 
