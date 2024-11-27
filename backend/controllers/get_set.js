@@ -19,7 +19,11 @@ const login=async(req,res)=>{
             return res.status(200).json({msg:"Incorrect password"});
         }
 
-        res.status(200).json({msg:"ok"});
+        res.status(200).json({
+            msg: "ok",
+            id: user._id,
+            username: user.username, 
+            });
     }catch(error){
         console.log("Login error:", error);
         res.status(500).json({msg:"Server error"});
@@ -138,30 +142,18 @@ const changePassword=async(req,res)=>{
         res.status(500).json({msg:"Server error"});
     }
 };
-const getProfile = async (req, res) => {
-    const { email } = req.query;
-  
-    try {
-      const user = await User.findOne({ email });
-      if (!user) {
-        return res.status(404).json({ msg: "User not found" });
-      }
-  
-      const profileData = {
-        username: user.username,
-        email: user.email,
-        memberSince: user.memberSince,
-        achievements: user.achievements,
-        storiesCreated: user.storiesCreated,
-        totalWritingTime: user.totalWritingTime,
-        favoriteGenre: user.favoriteGenre,
-      };
-  
-      res.status(200).json(profileData);
-    } catch (error) {
-      console.error("Error retrieving profile data:", error);
-      res.status(500).json({ msg: "Server error" });
+const getProfile= async (req, res) => {
+    const { _id } = req.query;
+
+    if (!_id) {
+      return res.status(400).json({ error: "ID is required" });
     }
+    const user = await User.findById(_id);
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+    res.status(200).json(user);
   };
+  
 
 module.exports={login,signup,confirmPassword,changePassword,getProfile};

@@ -1,22 +1,49 @@
 import React from 'react';
 import { useAuthStore } from '../store/authStore';
 import { User, Mail, BookOpen, Clock, Calendar, Award } from 'lucide-react';
+import { useState } from 'react';
+import { useEffect } from 'react';
+import axios from 'axios';
+import {useNavigate} from 'react-router-dom';
 
 function Profile() {
-  const user = useAuthStore((state) => state.user);
+  const [details, setDetails] = useState(null); 
+  const navigate = useNavigate();
 
-  // Mock stats - replace with actual data from your backend
-  const stats = {
-    storiesCreated: 12,
-    totalWritingTime: "24 hours",
-    favoriteGenre: "Fantasy",
-    memberSince: "March 2024",
-    achievements: [
-      "Prolific Writer",
-      "Genre Explorer",
-      "Consistent Creator"
-    ]
-  };
+ 
+
+
+  useEffect(() => {
+    const storedUser = sessionStorage.getItem("user");
+
+    if (!storedUser) {
+      // Redirect to login if no user data is stored
+      navigate("/login");
+      return;
+    }
+
+    const fetchUserDetails = async () => {
+      try {
+        const user = JSON.parse(storedUser); // Parse user details from session storage
+        const response = await axios.get("http://localhost:3000/en/getuserdata", {
+          params: { _id: user.id }, // Send the user ID to the backend
+        });
+        setDetails(response.data); // Store response data in state
+      } catch (error) {
+        console.error("Error fetching user details:", error);
+        navigate("/login"); // Redirect to login on error
+      }
+    };
+
+    fetchUserDetails();
+  }, [navigate]);
+
+  if (!details) {
+    // Optionally display a loader or placeholder while fetching data
+    return <div>Loading...</div>;
+  }
+  
+  
 
   return (
     <div className="max-w-4xl mx-auto">
@@ -28,10 +55,10 @@ function Profile() {
               <User className="h-8 w-8 text-indigo-600" />
             </div>
             <div>
-              <h1 className="text-2xl font-bold text-white">{user?.name}</h1>
+              <h1 className="text-2xl font-bold text-white">{details.username}</h1>
               <div className="flex items-center space-x-2 text-indigo-100">
                 <Mail className="h-4 w-4" />
-                <span>{user?.email}</span>
+                <span>{details.email}</span>
               </div>
             </div>
           </div>
@@ -44,7 +71,7 @@ function Profile() {
               <BookOpen className="h-6 w-6 text-indigo-600" />
               <div>
                 <p className="text-sm text-gray-500">Stories Created</p>
-                <p className="text-lg font-semibold text-gray-800">{stats.storiesCreated}</p>
+                <p className="text-lg font-semibold text-gray-800">{details.storiesCreated}</p>
               </div>
             </div>
 
@@ -52,7 +79,7 @@ function Profile() {
               <Clock className="h-6 w-6 text-indigo-600" />
               <div>
                 <p className="text-sm text-gray-500">Total Writing Time</p>
-                <p className="text-lg font-semibold text-gray-800">{stats.totalWritingTime}</p>
+                <p className="text-lg font-semibold text-gray-800">{details.totalWritingTime}</p>
               </div>
             </div>
 
@@ -60,7 +87,7 @@ function Profile() {
               <Calendar className="h-6 w-6 text-indigo-600" />
               <div>
                 <p className="text-sm text-gray-500">Member Since</p>
-                <p className="text-lg font-semibold text-gray-800">{stats.memberSince}</p>
+                <p className="text-lg font-semibold text-gray-800">{details.memberSince}</p>
               </div>
             </div>
           </div>
@@ -72,7 +99,7 @@ function Profile() {
               <h2 className="text-lg font-semibold text-gray-800">Achievements</h2>
             </div>
             <ul className="space-y-3">
-              {stats.achievements.map((achievement, index) => (
+              {details.achievements.map((achievement, index) => (
                 <li key={index} className="flex items-center space-x-2">
                   <span className="w-2 h-2 bg-indigo-600 rounded-full"></span>
                   <span className="text-gray-700">{achievement}</span>

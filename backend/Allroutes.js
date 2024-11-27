@@ -7,5 +7,6 @@ router.post("/getdata",login);
 router.post("/change-password",changePassword);
 router.post("/signup",signup);
 router.post("/confirm",confirmPassword);
+router.get("/getuserdata",getProfile);
 
 module.exports=router;

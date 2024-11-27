@@ -16,9 +16,10 @@ const Login = () => {
       e.preventDefault();
       try {
           const response = await axios.post("http://localhost:3000/en/getdata", { email, password });
-          const data = response.data.msg; 
-          if (data === 'ok') {
+          const {id,username,msg}=response.data; 
+          if (msg === 'ok') {
               alert("Successfully logged in");
+              sessionStorage.setItem("user", JSON.stringify({ id, username, email }));
               login({ email });
               navigate("/profile");
 
