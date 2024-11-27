@@ -1,16 +1,24 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { PenTool, Library, History, Sparkles } from 'lucide-react';
 import { useAuthStore } from '../store/authStore';
 import '../styles/Dashboard.css';
 
 export default function Dashboard() {
-  const user = useAuthStore((state) => state.user);
+  const [user,setUser]=useState("");
+  useEffect(() => {
+    const storedData = sessionStorage.getItem('user');
+    if (storedData) {
+      const userdata = JSON.parse(storedData);
+      setUser(userdata.username);
+    }
+  }, []); // Dependency array ensures useEffect runs only once.
+  
 
   return (
     <div className="max-w-6xl mx-auto">
       <div className="dashboard-welcome">
-        <h1 className="text-4xl font-bold mb-4">Welcome back, {user?.name}!</h1>
+        <h1 className="text-4xl font-bold mb-4">Welcome back, {user.toUpperCase()}!</h1>
         <p className="text-lg text-indigo-100">Ready to craft your next masterpiece?</p>
       </div>
 
