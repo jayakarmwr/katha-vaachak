@@ -1,5 +1,5 @@
-import React from 'react';
-import { Library, Edit, Trash2 } from 'lucide-react';
+import React from "react";
+import { Library, Edit, Trash2 } from "lucide-react";
 
 // Mock data - replace with actual data from your backend
 const mockStories = [
@@ -8,15 +8,15 @@ const mockStories = [
     title: "The Lost Kingdom",
     genre: "Fantasy",
     lastModified: "2024-03-10",
-    excerpt: "In a realm forgotten by time..."
+    excerpt: "In a realm forgotten by time...",
   },
   {
     id: 2,
     title: "Stellar Dreams",
     genre: "Science Fiction",
     lastModified: "2024-03-09",
-    excerpt: "The colony ship drifted silently..."
-  }
+    excerpt: "The colony ship drifted silently...",
+  },
 ];
 
 function MyStories() {
@@ -32,7 +32,9 @@ function MyStories() {
           <div key={story.id} className="bg-white rounded-xl shadow-lg p-6">
             <div className="flex justify-between items-start">
               <div>
-                <h2 className="text-xl font-bold text-gray-800 mb-2">{story.title}</h2>
+                <h2 className="text-xl font-bold text-gray-800 mb-2">
+                  {story.title}
+                </h2>
                 <p className="text-sm text-gray-500 mb-2">
                   Genre: {story.genre} • Last modified: {story.lastModified}
                 </p>
