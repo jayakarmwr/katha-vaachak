@@ -1,8 +1,9 @@
 const bcrypt=require("bcryptjs");
 const jwt=require("jsonwebtoken");
 const nodemailer=require("nodemailer");
-const {User} =require("../Schema");
+const {User,Story} =require("../Schema");
 require('dotenv').config();
+
 
 
 const login=async(req,res)=>{
@@ -154,6 +155,37 @@ const getProfile= async (req, res) => {
     }
     res.status(200).json(user);
   };
+
+
+const savestory = async (req, res) => {
+    const { genre, title, plot, generatedStory, images, email_id } = req.body;
+    
+
+    try {
+        // Find the user by email
+        const user = await User.findOne({ email: email_id }).select('_id');
+        if (!user) {
+            return res.status(400).json({ message: 'User not found with the provided email' });
+        }
+
+        const Storygeneration = new Story({
+            userId: user._id, // Associate story with user ID
+            genre,
+            title,
+            plot,
+            generatedStory,
+            images
+        });
+
+        // Save the story to the database
+        await Storygeneration.save();
+        res.status(201).json({ message: 'Story saved successfully' });
+    } catch (error) {
+        console.error('Error saving story:', error.message || error);
+        res.status(500).json({ message: 'Error saving the story' });
+    }
+};
+
   
 
-module.exports={login,signup,confirmPassword,changePassword,getProfile};
+module.exports={login,signup,confirmPassword,changePassword,getProfile,savestory};
