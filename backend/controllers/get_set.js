@@ -143,6 +143,7 @@ const changePassword=async(req,res)=>{
         res.status(500).json({msg:"Server error"});
     }
 };
+
 const getProfile= async (req, res) => {
     const { _id } = req.query;
 
@@ -153,7 +154,8 @@ const getProfile= async (req, res) => {
     if (!user) {
       return res.status(404).json({ error: "User not found" });
     }
-    res.status(200).json(user);
+    const stories=await Story.find({userId:user._id}).countDocuments();
+    res.status(200).json({user,stories});
   };
 
 
@@ -162,14 +164,14 @@ const savestory = async (req, res) => {
     
 
     try {
-        // Find the user by email
+        
         const user = await User.findOne({ email: email_id }).select('_id');
         if (!user) {
             return res.status(400).json({ message: 'User not found with the provided email' });
         }
 
         const Storygeneration = new Story({
-            userId: user._id, // Associate story with user ID
+            userId: user._id,
             genre,
             title,
             plot,
@@ -177,7 +179,7 @@ const savestory = async (req, res) => {
             images
         });
 
-        // Save the story to the database
+       
         await Storygeneration.save();
         res.status(201).json({ message: 'Story saved successfully' });
     } catch (error) {
@@ -186,6 +188,78 @@ const savestory = async (req, res) => {
     }
 };
 
+const setlike = async (req, res) => {
+    try {
+      const { email, title } = req.body;
+  
+     
+      const user = await User.findOne({ email }).select("_id");
+      if (!user) {
+        return res.status(404).json({ message: "User not found." });
+      }
+  
+      
+      const story = await Story.findOneAndUpdate({ userId: user._id, title },{ liked: true },{ new: true });
+      if (!story) {
+        return res.status(404).json({ message: "Story not found for the user." });
+      }
+  
+      
+
+      res.status(200).json({ message: "Story liked successfully!" });
+    } catch (error) {
+      console.error("Error in setlike function:", error);
+      res.status(500).json({ message: "An error occurred while liking the story." });
+    }
+  };
+
+
+
+const getlikedstories=async(req,res)=>
+  {
+    try {
+        const { id } = req.query;
+        //console.log(id);
+        if (!id) {
+          return res.status(400).json({ message: "User ID is required." });
+        }
+        const stories = await Story.find({ userId: id ,liked:true});
+        //console.log(stories);
+    
+        
+        if (stories.length === 0) {
+          return res.status(404).json({ message: "No stories found for this user." });
+        }
+    
+        res.status(200).json(stories);
+      } catch (error) {
+        console.error("Error fetching stories:", error.message);
+        res.status(500).json({ message: "An error occurred while fetching stories." });
+      }
+  }
+
+  const setdislike=async(req,res)=>
+  {
+    
+    try{
+        const {id}=req.body;
+        if (!id) 
+        {
+            return res.status(400).json({ message: "User ID is required." });
+        }
+        const stories=await Story.findByIdAndUpdate({_id:id},{liked:false},{new: true});
+        if (stories.length === 0) {
+            return res.status(404).json({ message: "No stories found for this user." });
+          }
+      
+          res.status(200).json(stories);
+        } catch (error) {
+          console.error("Error fetching stories:", error.message);
+          res.status(500).json({ message: "An error occurred while fetching stories." });
+        }
+  }
   
 
-module.exports={login,signup,confirmPassword,changePassword,getProfile,savestory};
+  
+
+module.exports={login,signup,confirmPassword,changePassword,getProfile,savestory,setlike,getlikedstories,setdislike};

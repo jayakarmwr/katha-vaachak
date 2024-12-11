@@ -21,6 +21,7 @@ const storySchema = new mongoose.Schema({
     generatedStory: { type: String, required: true },
     images: { type: [String], required: false },
     createdAt: { type: Date, default: Date.now },
+    liked:{type:Boolean,default: false },
 
 });
 

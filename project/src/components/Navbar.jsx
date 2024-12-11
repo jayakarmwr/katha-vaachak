@@ -9,9 +9,12 @@ export default function Navbar() {
   const navigate = useNavigate();
 
   const handleLogout = () => {
+    sessionStorage.removeItem("user");
     logout();
     navigate('/login');
   };
+
+
 
   if (!isAuthenticated) return null;
 

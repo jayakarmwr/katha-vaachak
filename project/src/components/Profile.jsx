@@ -8,6 +8,7 @@ import {useNavigate} from 'react-router-dom';
 
 function Profile() {
   const [details, setDetails] = useState(null); 
+  const [count,setCount]=useState(0);
   const navigate = useNavigate();
 
  
@@ -28,7 +29,8 @@ function Profile() {
         const response = await axios.get("http://localhost:3000/en/getuserdata", {
           params: { _id: user.id }, // Send the user ID to the backend
         });
-        setDetails(response.data); // Store response data in state
+        setDetails(response.data.user); // Store response data in state
+        setCount(response.data.stories);
       } catch (error) {
         console.error("Error fetching user details:", error);
         navigate("/login"); // Redirect to login on error
@@ -71,7 +73,7 @@ function Profile() {
               <BookOpen className="h-6 w-6 text-indigo-600" />
               <div>
                 <p className="text-sm text-gray-500">Stories Created</p>
-                <p className="text-lg font-semibold text-gray-800">{details.storiesCreated}</p>
+                <p className="text-lg font-semibold text-gray-800">{count}</p>
               </div>
             </div>
 
