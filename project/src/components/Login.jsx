@@ -19,9 +19,11 @@ const Login = () => {
           const {id,username,msg}=response.data; 
           if (msg === 'ok') {
               alert("Successfully logged in");
-              sessionStorage.setItem("user", JSON.stringify({ id, username, email }));
-              login({ email });
-              navigate("/profile");
+              const userData = { id, username, email };
+              sessionStorage.setItem("user", JSON.stringify(userData));
+
+    // Pass the full user data to the login method
+    login(userData);
 
           }
           else if(data==='User not found'){
