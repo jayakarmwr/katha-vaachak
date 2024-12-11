@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 function CreateStory() {
   const [email, setEmail] = useState("");
@@ -11,7 +12,7 @@ function CreateStory() {
   const [storyError, setStoryError] = useState("");
   const [imageError, setImageError] = useState("");
 
-  // Load email from session storage on component mount
+ 
   useEffect(() => {
     const storedData = sessionStorage.getItem('user');
     if (storedData) {
@@ -19,6 +20,22 @@ function CreateStory() {
       setEmail(userData.email);
     }
   }, []);
+
+  const naviagte=useNavigate();
+
+  const handlelikedstories=async()=>
+  {
+    try{
+      const response=await axios.post("http://localhost:3000/en/setlike",{email,title:story.title});
+      alert(response.data.message);
+      naviagte("/my-stories");
+
+    }
+    catch(error)
+    {
+      alert(error.message);
+    }
+  }
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -186,6 +203,7 @@ function CreateStory() {
           <p className="text-red-500">{imageError}</p>
         ) : null}
       </div>
+      <button onClick={handlelikedstories}> save story </button>
     </div>
   );
 }
