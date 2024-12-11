@@ -1,33 +1,57 @@
-import React from 'react';
-import { useLocation } from 'react-router-dom';
+import React, { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
+import axios from "axios";
+import { History } from "lucide-react";
 
 function StoryDisplay() {
-  const location = useLocation();
-  const story = location.state?.story;
+  const { id } = useParams();
+  const [story, setStory] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    const fetchStory = async () => {
+      setLoading(true);
+      setError("");
+
+      try {
+        const response = await axios.get(
+          `http://localhost:3000/en/story-display/${id}`
+        );
+        setStory(response.data);
+      } catch (error) {
+        console.error("Error fetching story:", error.message);
+        setError("Failed to load the story. Please try again later.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchStory();
+  }, [id]);
+
+  if (loading) return <p>Loading story...</p>;
+  if (error) return <p className="text-red-500">{error}</p>;
 
   return (
-    <div className="max-w-4xl mx-auto mt-10">
-      <div className="bg-white rounded-xl shadow-xl p-8">
-        <h1 className="text-3xl font-bold text-gray-800 mb-6">Generated Story</h1>
+    <div className="max-w-4xl mx-auto">
+      <div className="flex items-center space-x-4 mb-8">
+        <History className="h-8 w-8 text-indigo-600" />
+        <h1 className="text-3xl font-bold text-gray-800">{story?.title}</h1>
+      </div>
 
-        {/* Story Inputs Overview */}
-        <div className="mb-6">
-          <p><strong>Genre:</strong> {story?.genre}</p>
-          <p><strong>Title:</strong> {story?.title}</p>
-          <p><strong>Plot:</strong> {story?.plot}</p>
-        </div>
-
-        {/* Empty Story Box */}
-        <div className="mt-4">
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Generated Story
-          </label>
-          <textarea
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-            rows={10}
-            placeholder="Your story will be generated here..."
-            readOnly
-          />
+      <div className="bg-white rounded-xl shadow-lg overflow-hidden p-6">
+        <h2 className="text-xl font-bold text-gray-800 mb-4">{story?.genre}</h2>
+        <p className="text-gray-700 whitespace-pre-line">{story?.generatedStory}</p>
+        <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+          {story?.images.map((image, i) => (
+            <img
+              key={i}
+              src={`data:image/png;base64,${image}`}
+              alt={`Story Image ${i + 1}`}
+              className="w-full h-64 object-cover rounded-lg"
+            />
+          ))}
         </div>
       </div>
     </div>

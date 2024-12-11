@@ -11,6 +11,7 @@ import StoryHistory from "./components/StoryHistory";
 import Profile from "./components/Profile";
 import Confirm from "./components/Confirm";
 import Forgot from "./components/Forgot";
+import StoryDisplay from "./components/StoryDisplay";
 
 function ProtectedRoute({ children }) {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
@@ -65,6 +66,7 @@ export default function App() {
                 </ProtectedRoute>
               }
             />
+            <Route path="/story-display/:id" element={<StoryDisplay />} />
             <Route
               path="/profile"
               element={

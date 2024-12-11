@@ -159,8 +159,6 @@ const getProfile= async (req, res) => {
 
 const savestory = async (req, res) => {
     const { genre, title, plot, generatedStory, images, email_id } = req.body;
-    
-
     try {
         // Find the user by email
         const user = await User.findOne({ email: email_id }).select('_id');
@@ -186,6 +184,37 @@ const savestory = async (req, res) => {
     }
 };
 
+const storyHistory = async (req, res) => {
+    const { email_id } = req.query;
+    if (!email_id) {
+        return res.status(400).json({ message: "Email is required to fetch story history." });
+    }
+    try {
+        const user = await User.findOne({ email: email_id }).select('_id');
+        if (!user) {
+            return res.status(400).json({ message: 'User not found with the provided email' });
+        }
   
+      const stories = await Story.find({ userId: user._id });
+      res.status(200).json( stories );
+    } catch (error) {
+      console.error("Error fetching story history:", error);
+      res.status(500).json({ msg: "Server error." });
+    }
+  };
+  
+  const getStoryById = async (req, res) => {
+    const { id } = req.params; // Extract the story ID from the request parameters
+    try {
+      const story = await Story.findById(id); // Find the story by its ID
+      if (!story) {
+        return res.status(404).json({ message: "Story not found" });
+      }
+      res.status(200).json(story);
+    } catch (error) {
+      console.error("Error fetching story by ID:", error);
+      res.status(500).json({ message: "Server error" });
+    }
+  };
 
-module.exports={login,signup,confirmPassword,changePassword,getProfile,savestory};
+module.exports={login,signup,confirmPassword,changePassword,getProfile,savestory,storyHistory,getStoryById};

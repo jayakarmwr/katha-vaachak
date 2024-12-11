@@ -1,25 +1,59 @@
-import React from 'react';
-import { History, Calendar, Clock } from 'lucide-react';
-
-// Mock data - replace with actual data from your backend
-const mockHistory = [
-  {
-    id: 1,
-    title: "The Lost Kingdom",
-    date: "2024-03-10",
-    duration: "45 minutes",
-    progress: "Completed chapter 1"
-  },
-  {
-    id: 2,
-    title: "Stellar Dreams",
-    date: "2024-03-09",
-    duration: "30 minutes",
-    progress: "Character development"
-  }
-];
+import React, { useEffect, useState } from "react";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
+import { History, Calendar } from "lucide-react";
 
 function StoryHistory() {
+  const [email, setEmail] = useState("");
+  const [stories, setStories] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
+  const navigate = useNavigate();
+
+  // Load email from session storage on component mount
+  useEffect(() => {
+    const storedData = sessionStorage.getItem('user');
+    if (storedData) {
+      const userData = JSON.parse(storedData);
+      setEmail(userData.email);
+    }
+  }, []);
+
+  // Fetch user stories
+  useEffect(() => {
+    if (!email) return;
+
+    const fetchStories = async () => {
+      setLoading(true);
+      setError("");
+
+      try {
+        const response = await axios.get("http://localhost:3000/en/save-history", {
+          params: { email_id:email },
+        });
+        console.log(response.data);
+        console.log(response.data.stories);
+        if (Array.isArray(response.data) && response.data.length > 0) {
+          setStories(response.data);
+        } else {
+          setStories([]);
+        }
+      } catch (error) {
+        console.error("Error fetching stories:", error.message);
+        setError("Failed to load story history. Please try again later.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchStories();
+  }, [email]);
+
+  const handleStoryClick = (id) => {
+    navigate(`/story-display/${id}`);
+  };
+
   return (
     <div className="max-w-4xl mx-auto">
       <div className="flex items-center space-x-4 mb-8">
@@ -29,38 +63,31 @@ function StoryHistory() {
 
       <div className="bg-white rounded-xl shadow-lg overflow-hidden">
         <div className="p-6">
-          <h2 className="text-xl font-bold text-gray-800 mb-4">Recent Writing Sessions</h2>
-          
+          {loading && <p>Loading your stories...</p>}
+          {error && <p className="text-red-500">{error}</p>}
+          {stories.length === 0 && !loading && !error && (
+            <p className="text-gray-600">No stories found. Start creating your stories!</p>
+          )}
+
           <div className="space-y-6">
-            {mockHistory.map((session) => (
-              <div key={session.id} className="border-b border-gray-200 pb-6 last:border-0 last:pb-0">
-                <div className="flex justify-between items-start">
-                  <div>
-                    <h3 className="text-lg font-semibold text-gray-800 mb-2">{session.title}</h3>
-                    <div className="flex items-center space-x-4 text-sm text-gray-600">
-                      <div className="flex items-center space-x-1">
-                        <Calendar className="h-4 w-4" />
-                        <span>{session.date}</span>
-                      </div>
-                      <div className="flex items-center space-x-1">
-                        <Clock className="h-4 w-4" />
-                        <span>{session.duration}</span>
-                      </div>
-                    </div>
-                    <p className="mt-2 text-gray-600">{session.progress}</p>
-                  </div>
+            {stories.map((story) => (
+              <div
+                key={story._id}
+                className="border-b border-gray-200 pb-6 last:border-0 last:pb-0 cursor-pointer hover:bg-gray-50 transition"
+                onClick={() => handleStoryClick(story._id)}
+              >
+                <h3 className="text-lg font-semibold text-gray-800 mb-2">
+                  {story.title}
+                </h3>
+                <div className="flex items-center text-sm text-gray-600">
+                  <Calendar className="h-4 w-4 mr-2" />
+                  <span>{story.genre}</span>
                 </div>
               </div>
             ))}
           </div>
         </div>
       </div>
-
-      {mockHistory.length === 0 && (
-        <div className="text-center py-12">
-          <p className="text-gray-600">No writing sessions recorded yet.</p>
-        </div>
-      )}
     </div>
   );
 }
