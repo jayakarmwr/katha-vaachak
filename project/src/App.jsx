@@ -20,6 +20,7 @@ function ProtectedRoute({ children }) {
 
 export default function App() {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+  
 
   return (
     <BrowserRouter>

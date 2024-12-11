@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from "react";
-import { Library, Edit, Trash2 } from "lucide-react";
+import { Library, Star } from "lucide-react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
 function MyStories() {
-  const [stories, setStories] = useState([]); 
+  const [stories, setStories] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null); 
+  const [error, setError] = useState(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -20,12 +20,13 @@ function MyStories() {
         }
 
         const response = await axios.get("http://localhost:3000/en/getlikedstories", {
-          params: { id: userId }, 
+          params: { id: userId },
         });
 
-        setStories(response.data); 
+        setStories(response.data);
+        setError(null);
       } catch (err) {
-        alert(error.response.data.message);
+        alert(err.response?.data?.message || "An error occurred.");
         setError("Failed to fetch stories. Please try again later.");
       } finally {
         setLoading(false);
@@ -35,10 +36,13 @@ function MyStories() {
     fetchStories();
   }, []);
 
+  const handleStoryClick = (id) => {
+    navigate(`/story-display/${id}`);
+  };
+
   const handledislike = async (storyId) => {
     try {
       const response = await axios.post("http://localhost:3000/en/dislike", { id: storyId });
-      alert(response.data.message);
 
       setStories((prevStories) => prevStories.filter((story) => story._id !== storyId));
     } catch (error) {
@@ -50,8 +54,8 @@ function MyStories() {
     }
   };
 
-  if (loading) return <p>Loading stories...</p>; 
-  if (error) return <p>{error}</p>; 
+  if (loading) return <p>Loading stories...</p>;
+  if (error) return <p>{error}</p>;
 
   return (
     <div className="max-w-4xl mx-auto">
@@ -63,27 +67,27 @@ function MyStories() {
       <div className="space-y-6">
         {stories.length > 0 ? (
           stories.map((story) => (
-            <div key={story._id} className="bg-white rounded-xl shadow-lg p-6">
+            <div
+              key={story._id}
+              className="bg-white rounded-xl shadow-lg p-6"
+              onClick={() => handleStoryClick(story._id)}
+            >
               <div className="flex justify-between items-start">
                 <div>
                   <h2 className="text-xl font-bold text-gray-800 mb-2">
                     {story.title}
                   </h2>
-                  <p className="text-sm text-gray-500 mb-2">
-                    Genre: {story.genre}
-                  </p>
+                  <p className="text-sm text-gray-500 mb-2">Genre: {story.genre}</p>
                 </div>
-                <div className="flex space-x-2">
-                  <button className="p-2 text-indigo-600 hover:bg-indigo-50 rounded-lg transition duration-200">
-                    <Edit className="h-5 w-5" />
-                  </button>
-                  <button
-                    className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition duration-200"
-                    onClick={() => handledislike(story._id)}
-                  >
-                    <Trash2 className="h-5 w-5" />
-                  </button>
-                </div>
+                <button
+                  className="p-2 text-yellow-400 hover:bg-yellow-50 rounded-lg transition duration-200"
+                  onClick={(e) => {
+                    e.stopPropagation(); // Prevent triggering the parent click event
+                    handledislike(story._id);
+                  }}
+                >
+                  <Star className="h-5 w-5" />
+                </button>
               </div>
             </div>
           ))

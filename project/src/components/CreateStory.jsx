@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { FaStar } from "react-icons/fa"; // Import FontAwesome star icon
 
 function CreateStory() {
   const [email, setEmail] = useState("");
@@ -11,31 +12,30 @@ function CreateStory() {
   const [loading, setLoading] = useState(false);
   const [storyError, setStoryError] = useState("");
   const [imageError, setImageError] = useState("");
+  const [isStarred, setIsStarred] = useState(false);
 
- 
+  const navigate = useNavigate();
+
   useEffect(() => {
-    const storedData = sessionStorage.getItem('user');
+    const storedData = sessionStorage.getItem("user");
     if (storedData) {
       const userData = JSON.parse(storedData);
       setEmail(userData.email);
     }
   }, []);
 
-  const naviagte=useNavigate();
-
-  const handlelikedstories=async()=>
-  {
-    try{
-      const response=await axios.post("http://localhost:3000/en/setlike",{email,title:story.title});
-      alert(response.data.message);
-      naviagte("/my-stories");
-
-    }
-    catch(error)
-    {
+  const handleLikedStories = async () => {
+    try {
+      const response = await axios.post("http://localhost:3000/en/setlike", {
+        email,
+        title: story.title,
+      });
+      
+      setIsStarred(true); 
+    } catch (error) {
       alert(error.message);
     }
-  }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -44,44 +44,37 @@ function CreateStory() {
     setImageError("");
 
     try {
-      // Step 1: Generate the story
       const response = await axios.post(
-        "https://bcac-34-125-74-10.ngrok-free.app/story",
+        "https://4cb5-34-87-12-216.ngrok-free.app/story",
         story,
         { headers: { "Content-Type": "application/json" }, timeout: 300000 }
-       
       );
 
       if (!response.data.story) throw new Error("Failed to generate story.");
       setGeneratedStory(response.data.story);
-      const prompts = response.data.prompts; // Extract prompts
+      const prompts = response.data.prompts;
       setPrompts(prompts);
 
-      // Step 2: Generate the images using returned prompts
       if (!response.data.prompts || response.data.prompts.length === 0) {
         throw new Error("No prompts returned for image generation.");
       }
 
       const imageResponse = await axios.post(
-        "http://127.0.0.1:5000/generate-images", // Update this to your Flask URL
-        { prompts }, // Directly pass the extracted prompts
+        "http://127.0.0.1:5000/generate-images",
+        { prompts },
         { headers: { "Content-Type": "application/json" } }
       );
-  
+
       setImages(imageResponse.data.images || []);
-  
 
       if (!imageResponse.data.images) throw new Error("No images generated.");
-      setImages(imageResponse.data.images);
 
-      // Step 3: Save data to backend
       const saveData = {
         ...story,
         generatedStory: response.data.story,
         email_id: email,
-        images: imageResponse.data.images
+        images: imageResponse.data.images,
       };
-      console.log(saveData);
 
       await axios.post("http://localhost:3000/en/save-story", saveData, {
         headers: { "Content-Type": "application/json" },
@@ -105,9 +98,7 @@ function CreateStory() {
   return (
     <div className="max-w-4xl mx-auto">
       <div className="bg-white rounded-xl shadow-xl p-8">
-        <h1 className="text-3xl font-bold text-gray-800 mb-8">
-          Create Your Story
-        </h1>
+        <h1 className="text-3xl font-bold text-gray-800 mb-8">Create Your Story</h1>
 
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
@@ -164,26 +155,27 @@ function CreateStory() {
           </div>
         </form>
 
-        {/* Display Story or Error */}
-        {generatedStory ? (
-          <div className="mt-8 bg-gray-50 p-6 rounded-lg shadow-md">
-            <h2 className="text-2xl font-bold text-gray-800 mb-4">
-              Generated Story
-            </h2>
-            <p className="text-gray-700 whitespace-pre-line">
-              {generatedStory}
-            </p>
+        {generatedStory && (
+          <div className="mt-8 bg-gray-50 p-6 rounded-lg shadow-md relative">
+            <h2 className="text-2xl font-bold text-gray-800 mb-4">Generated Story</h2>
+            <p className="text-gray-700 whitespace-pre-line">{generatedStory}</p>
+            <button
+              onClick={handleLikedStories}
+              className="absolute top-4 right-4"
+            >
+              <FaStar
+                size={24}
+                className={isStarred ? "text-yellow-400" : "text-gray-400"}
+              />
+            </button>
           </div>
-        ) : storyError ? (
-          <p className="text-red-500">{storyError}</p>
-        ) : null}
+        )}
 
-        {/* Display Images or Error */}
-        {images.length > 0 ? (
+        {storyError && <p className="text-red-500 mt-4">{storyError}</p>}
+
+        {images.length > 0 && (
           <div className="mt-8">
-            <h2 className="text-2xl font-bold text-gray-800 mb-4">
-              Story Images
-            </h2>
+            <h2 className="text-2xl font-bold text-gray-800 mb-4">Story Images</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
               {images.map((image, index) => (
                 <div
@@ -199,11 +191,10 @@ function CreateStory() {
               ))}
             </div>
           </div>
-        ) : imageError ? (
-          <p className="text-red-500">{imageError}</p>
-        ) : null}
+        )}
+
+        {imageError && <p className="text-red-500 mt-4">{imageError}</p>}
       </div>
-      <button onClick={handlelikedstories}> save story </button>
     </div>
   );
 }

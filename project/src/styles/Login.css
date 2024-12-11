@@ -1,6 +1,6 @@
 .login-container {
   @apply min-h-[80vh] flex items-center justify-center;
-  background: linear-gradient(135deg, rgba(79, 70, 229, 0.1) 0%, rgba(147, 51, 234, 0.1) 100%);
+  /*background: linear-gradient(135deg, rgba(79, 70, 229, 0.1) 0%, rgba(147, 51, 234, 0.1) 100%);*/
 }
 
 .login-card {
