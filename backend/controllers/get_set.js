@@ -239,7 +239,7 @@ const getlikedstories=async(req,res)=>
         if (!id) {
           return res.status(400).json({ message: "User ID is required." });
         }
-        const stories = await Story.find({ userId: id }).select('_id genre title');
+        const stories = await Story.find({ userId: id ,liked:true}).select('_id genre title');
         //console.log(stories);
     
         
