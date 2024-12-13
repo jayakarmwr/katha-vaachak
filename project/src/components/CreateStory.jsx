@@ -108,6 +108,63 @@ function CreateStory() {
     }
   };
 
+  const renderStoryWithImages = () => {
+    const storySegments = generatedStory.split("\n\n").filter((seg) => seg.trim() !== ""); // Split into paragraphs, ignoring empty lines
+    const totalSegments = storySegments.length;
+    const totalImages = images.length;
+  
+    // Calculate interval to insert images
+    const interval = Math.ceil(totalSegments / (totalImages || 1));
+  
+    const content = [];
+  
+    storySegments.forEach((segment, index) => {
+      // Add the story text
+      content.push(
+        <p key={`story-segment-${index}`} className="text-gray-700 whitespace-pre-line mb-4">
+          {segment}
+        </p>
+      );
+  
+      // Insert an image after every interval segments
+      if ((index + 1) % interval === 0 && Math.floor(index / interval) < totalImages) {
+        const imageIndex = Math.floor(index / interval);
+        content.push(
+          <div
+            key={`image-${imageIndex}`}
+            className="flex justify-center items-center mb-4"
+          >
+            <img
+              src={`data:image/png;base64,${images[imageIndex]}`}
+              alt={`Generated Story Image ${imageIndex + 1}`}
+              className="max-w-full max-h-72 object-contain rounded-lg shadow-md"
+            />
+          </div>
+        );
+      }
+    });
+  
+    // Add any remaining images after the story content
+    for (let i = Math.ceil(totalSegments / interval); i < totalImages; i++) {
+      content.push(
+        <div
+          key={`image-extra-${i}`}
+          className="flex justify-center items-center mb-4"
+        >
+          <img
+            src={`data:image/png;base64,${images[i]}`}
+            alt={`Generated Story Image ${i + 1}`}
+            className="max-w-full max-h-72 object-contain rounded-lg shadow-md"
+          />
+        </div>
+      );
+    }
+  
+    return content;
+  };
+  
+  
+
   return (
     <div className="max-w-4xl mx-auto">
       <div className="bg-white rounded-xl shadow-xl p-8">
@@ -129,7 +186,7 @@ function CreateStory() {
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Story Title (Optional)
+              Story Title
             </label>
             <input
               type="text"
@@ -141,7 +198,7 @@ function CreateStory() {
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Story Plot (Optional)
+              Story Plot
             </label>
             <textarea
               value={story.plot}
@@ -169,7 +226,7 @@ function CreateStory() {
         {generatedStory && (
           <div className="mt-8 bg-gray-50 p-6 rounded-lg shadow-md relative">
             <h2 className="text-2xl font-bold text-gray-800 mb-4">Generated Story</h2>
-            <p className="text-gray-700 whitespace-pre-line">{generatedStory}</p>
+            {renderStoryWithImages()}
             <button
               onClick={handleLikedStories}
               className="absolute top-4 right-4"
@@ -183,26 +240,6 @@ function CreateStory() {
         )}
 
         {storyError && <p className="text-red-500 mt-4">{storyError}</p>}
-
-        {images.length > 0 && (
-          <div className="mt-8">
-            <h2 className="text-2xl font-bold text-gray-800 mb-4">Story Images</h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-              {images.map((image, index) => (
-                <div
-                  key={index}
-                  className="bg-gray-200 rounded-lg overflow-hidden shadow-md"
-                >
-                  <img
-                    src={`data:image/png;base64,${image}`}
-                    alt={`Generated Story Image ${index + 1}`}
-                    className="w-full h-64 object-cover"
-                  />
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
 
         {imageError && <p className="text-red-500 mt-4">{imageError}</p>}
       </div>
