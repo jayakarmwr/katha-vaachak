@@ -197,7 +197,7 @@ const storyHistory = async (req, res) => {
           return res.status(400).json({ message: 'User not found with the provided email' });
       }
 
-    const stories = await Story.find({ userId: user._id });
+    const stories = await Story.find({ userId: user._id }).select('_id genre title');
     res.status(200).json( stories );
   } catch (error) {
     console.error("Error fetching story history:", error);
@@ -239,7 +239,7 @@ const getlikedstories=async(req,res)=>
         if (!id) {
           return res.status(400).json({ message: "User ID is required." });
         }
-        const stories = await Story.find({ userId: id ,liked:true});
+        const stories = await Story.find({ userId: id }).select('_id genre title');
         //console.log(stories);
     
         
@@ -275,9 +275,9 @@ const getlikedstories=async(req,res)=>
   }
   
   const getStoryById = async (req, res) => {
-    const { id } = req.params; // Extract the story ID from the request parameters
+    const { id } = req.params; 
     try {
-      const story = await Story.findById(id); // Find the story by its ID
+      const story = await Story.findById(id); 
       if (!story) {
         return res.status(404).json({ message: "Story not found" });
       }

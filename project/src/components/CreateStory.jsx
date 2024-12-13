@@ -24,14 +24,21 @@ function CreateStory() {
     }
   }, []);
 
+  const extractTitleAndPlot = (fullStory) => {
+    const lines = fullStory.split("\n").filter((line) => line.trim() !== "");
+    const title = lines.length > 0 ? lines[0] : "Untitled";
+    const plot = lines.slice(1).join("\n");
+    return { title, plot };
+  };
+
   const handleLikedStories = async () => {
     try {
-      const response = await axios.post("http://localhost:3000/en/setlike", {
+      const titleToUse = story.title || extractTitleAndPlot(generatedStory).title;
+      await axios.post("http://localhost:3000/en/setlike", {
         email,
-        title: story.title,
+        title: titleToUse,
       });
-      
-      setIsStarred(true); 
+      setIsStarred(true);
     } catch (error) {
       alert(error.message);
     }
@@ -45,7 +52,7 @@ function CreateStory() {
 
     try {
       const response = await axios.post(
-        "https://4cb5-34-87-12-216.ngrok-free.app/story",
+        "https://1e53-34-124-189-128.ngrok-free.app/story",
         story,
         { headers: { "Content-Type": "application/json" }, timeout: 300000 }
       );
@@ -69,8 +76,14 @@ function CreateStory() {
 
       if (!imageResponse.data.images) throw new Error("No images generated.");
 
+      const { title, plot } = story.title && story.plot
+        ? { title: story.title, plot: story.plot }
+        : extractTitleAndPlot(response.data.story);
+
       const saveData = {
-        ...story,
+        genre: story.genre,
+        title,
+        plot,
         generatedStory: response.data.story,
         email_id: email,
         images: imageResponse.data.images,
@@ -116,7 +129,7 @@ function CreateStory() {
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Story Title
+              Story Title (Optional)
             </label>
             <input
               type="text"
@@ -124,12 +137,11 @@ function CreateStory() {
               onChange={(e) => setStory({ ...story, title: e.target.value })}
               className="w-full px-4 py-2 border rounded-lg"
               placeholder="Enter your story title"
-              required
             />
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Story Plot
+              Story Plot (Optional)
             </label>
             <textarea
               value={story.plot}
@@ -137,7 +149,6 @@ function CreateStory() {
               className="w-full px-4 py-2 border rounded-lg"
               placeholder="Describe your story plot"
               rows={4}
-              required
             />
           </div>
           <div>
