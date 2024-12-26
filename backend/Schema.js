@@ -25,7 +25,19 @@ const storySchema = new mongoose.Schema({
 
 });
 
+
+const feedbackSchema = new mongoose.Schema({
+    email: { type: String, required: true }, // Email field added
+    feedback: { type: String, required: true },
+    rating: { type: Number, min: 1, max: 5 }, // Optional: Rating 1-5
+    createdAt: { type: Date, default: Date.now },
+  });
+
 const Story = mongoose.model('Story', storySchema);
 
 const User = mongoose.model('User', userSchema);
-module.exports = { User,Story };
+
+const Feedback=mongoose.model('Feedback',feedbackSchema);
+
+
+module.exports = { User,Story,Feedback };

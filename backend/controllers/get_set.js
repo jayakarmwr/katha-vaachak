@@ -1,7 +1,7 @@
 const bcrypt=require("bcryptjs");
 const jwt=require("jsonwebtoken");
 const nodemailer=require("nodemailer");
-const {User,Story} =require("../Schema");
+const {User,Story,Feedback} =require("../Schema");
 require('dotenv').config();
 
 
@@ -312,37 +312,28 @@ const getlikedstories=async(req,res)=>
   };
 
 
+  const submitFeedback = async (req, res) => {
+    const { email, feedback, rating } = req.body;
 
-const updateuserdata=async(req,res)=>
-{
+    if (!feedback) {
+      return res.status(400).json({ msg: "Email and feedback are required." });
+    }
+
     try {
-        const { _id, totalWritingTime, achievements } = req.body;
-    
-        if (!_id) {
-          return res.status(400).json({ error: "User ID is required" });
-        }
-    
-        const user = await User.findById(_id);
-    
-        if (!user) {
-          return res.status(404).json({ error: "User not found" });
-        }
-    
-        if (totalWritingTime !== undefined) {
-          user.totalWritingTime = totalWritingTime;
-        }
-        if (achievements && Array.isArray(achievements)) {
-          user.achievements = achievements;
-        }
-    
-        await user.save();
-    
-        res.status(200).json({ message: "User data updated successfully" });
-      } catch (error) {
-        console.error("Error updating user data:", error);
-        res.status(500).json({ error: "Internal server error" });
-      }
-}
+    // Save feedback to the database
+      const newFeedback = new Feedback({
+        email,
+        feedback,
+        rating, // Optional: Include rating if provided
+      });
 
-module.exports={login,signup,confirmPassword,changePassword,getProfile,savestory,storyHistory,getStoryById,setlike,getlikedstories,setdislike,updateuserdata};
+      await newFeedback.save();
+      res.status(200).json({ msg: "Feedback submitted successfully." });
+    } catch (error) {
+      console.error("Error submitting feedback:", error);
+      res.status(500).json({ msg: "Server error." });
+    }
+  };
+
+module.exports={login,signup,confirmPassword,changePassword,getProfile,savestory,storyHistory,getStoryById,setlike,getlikedstories,setdislike,submitFeedback};
   

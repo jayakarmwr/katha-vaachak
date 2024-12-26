@@ -1,12 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { User, Mail, BookOpen, Calendar, Award } from 'lucide-react';
+import { FaStar } from 'react-icons/fa'; // Import star icons
 import axios from 'axios';
 
 function Profile() {
   const [details, setDetails] = useState(null);
   const [storyCount, setStoryCount] = useState(0); // Updated state for total story count
   const [achievements, setAchievements] = useState([]);
+  const [rating, setRating] = useState(0); // State for feedback rating
+  const [feedback, setFeedback] = useState('');// State for feedback text
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -45,6 +48,25 @@ function Profile() {
 
     fetchUserDetails();
   }, [navigate]);
+
+  const handleFeedbackSubmit = async (e) => {
+    e.preventDefault();
+
+    try {
+      const response = await axios.post("http://localhost:3000/en/feedback", {
+        email: details.email,
+        rating,
+        feedback,
+      });
+
+      console.log(response.data.message);
+      alert("Feedback submitted successfully!");
+      setRating(0); // Reset rating
+      setFeedback(''); // Reset feedback
+    } catch (error) {
+      console.error("Error submitting feedback:", error);
+    }
+  };
 
   if (!details) {
     return <div>Loading...</div>;
@@ -108,6 +130,39 @@ function Profile() {
               )}
             </ul>
           </div>
+        </div>
+
+        {/* Feedback Form */}
+        <div className="bg-white p-8 border-t border-gray-200">
+          <h2 className="text-xl font-semibold text-gray-800 mb-4">Give Us Your Feedback</h2>
+          <form onSubmit={handleFeedbackSubmit}>
+            <div className="flex items-center justify-center space-x-2 mb-4">
+              {[1, 2, 3, 4, 5].map((star) => (
+                <FaStar
+                  key={star}
+                  onClick={() => setRating(star)}
+                  className={`cursor-pointer text-3xl ${
+                    star <= rating ? "text-yellow-500" : "text-gray-300"
+                  }`}
+                />
+              ))}
+            </div>
+
+            <textarea
+              value={feedback}
+              onChange={(e) => setFeedback(e.target.value)}
+              placeholder="Write your feedback here..."
+              className="w-full p-3 border rounded-lg mb-4"
+              rows="4"
+            />
+
+            <button
+              type="submit"
+              className="w-full bg-indigo-600 text-white py-2 rounded-lg text-lg font-semibold hover:bg-indigo-700"
+            >
+              Submit Feedback
+            </button>
+          </form>
         </div>
       </div>
     </div>
