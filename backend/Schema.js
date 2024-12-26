@@ -17,7 +17,7 @@ const storySchema = new mongoose.Schema({
     userId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
     genre: { type: String, required: true },
     title: { type: String, required: true },
-    plot: { type: String, required: true },
+    //plot: { type: String, required: true },
     generatedStory: { type: String, required: true },
     images: { type: [String], required: false },
     createdAt: { type: Date, default: Date.now },

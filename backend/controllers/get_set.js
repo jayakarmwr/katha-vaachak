@@ -19,11 +19,12 @@ const login=async(req,res)=>{
         if(!isPasswordValid){
             return res.status(200).json({msg:"Incorrect password"});
         }
-
+        
+        await user.save();
         res.status(200).json({
             msg: "ok",
             id: user._id,
-            username: user.username, 
+            username: user.username,
             });
     }catch(error){
         console.log("Login error:", error);
@@ -147,20 +148,43 @@ const changePassword=async(req,res)=>{
 const getProfile= async (req, res) => {
     const { _id } = req.query;
 
-    if (!_id) {
-      return res.status(400).json({ error: "ID is required" });
+  if (!_id) {
+    return res.status(400).json({ error: "ID is required" });
+  }
+
+  const user = await User.findById(_id);
+  if (!user) {
+    return res.status(404).json({ error: "User not found" });
+  }
+
+  const stories = await Story.find({ userId: user._id }).select('genre');
+  //console.log(stories);
+
+  const genreCounts = {};
+  stories.forEach((story) => {
+    const genre = story.genre.trim(); 
+    if (genre) { 
+      genreCounts[genre] = (genreCounts[genre] || 0) + 1;
     }
-    const user = await User.findById(_id);
-    if (!user) {
-      return res.status(404).json({ error: "User not found" });
+  });
+  //console.log(genreCounts); 
+
+  const achievements = [];
+  for (const [genre, count] of Object.entries(genreCounts)) {
+    if (count >= 2) {  
+      achievements.push(`Master of ${genre}`);
     }
-    const stories=await Story.find({userId:user._id}).countDocuments();
-    res.status(200).json({user,stories});
+  }
+  //console.log(achievements);  
+
+  res.status(200).json({ user, achievements,genreCounts });
   };
 
 
 const savestory = async (req, res) => {
-    const { genre, title, plot, generatedStory, images, email_id } = req.body;
+    const { genre, title, generatedStory, images, email_id } = req.body;
+    console.log(req.body.title);
+    
     try {
         
         const user = await User.findOne({ email: email_id }).select('_id');
@@ -172,7 +196,6 @@ const savestory = async (req, res) => {
             userId: user._id,
             genre,
             title,
-            plot,
             generatedStory,
             images
         });
@@ -288,5 +311,38 @@ const getlikedstories=async(req,res)=>
     }
   };
 
-module.exports={login,signup,confirmPassword,changePassword,getProfile,savestory,storyHistory,getStoryById,setlike,getlikedstories,setdislike};
+
+
+const updateuserdata=async(req,res)=>
+{
+    try {
+        const { _id, totalWritingTime, achievements } = req.body;
+    
+        if (!_id) {
+          return res.status(400).json({ error: "User ID is required" });
+        }
+    
+        const user = await User.findById(_id);
+    
+        if (!user) {
+          return res.status(404).json({ error: "User not found" });
+        }
+    
+        if (totalWritingTime !== undefined) {
+          user.totalWritingTime = totalWritingTime;
+        }
+        if (achievements && Array.isArray(achievements)) {
+          user.achievements = achievements;
+        }
+    
+        await user.save();
+    
+        res.status(200).json({ message: "User data updated successfully" });
+      } catch (error) {
+        console.error("Error updating user data:", error);
+        res.status(500).json({ error: "Internal server error" });
+      }
+}
+
+module.exports={login,signup,confirmPassword,changePassword,getProfile,savestory,storyHistory,getStoryById,setlike,getlikedstories,setdislike,updateuserdata};
   

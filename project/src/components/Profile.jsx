@@ -1,39 +1,45 @@
-import React from 'react';
-import { useAuthStore } from '../store/authStore';
-import { User, Mail, BookOpen, Clock, Calendar, Award } from 'lucide-react';
-import { useState } from 'react';
-import { useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { User, Mail, BookOpen, Calendar, Award } from 'lucide-react';
 import axios from 'axios';
-import {useNavigate} from 'react-router-dom';
 
 function Profile() {
-  const [details, setDetails] = useState(null); 
-  const [count,setCount]=useState(0);
+  const [details, setDetails] = useState(null);
+  const [storyCount, setStoryCount] = useState(0); // Updated state for total story count
+  const [achievements, setAchievements] = useState([]);
   const navigate = useNavigate();
-
- 
-
 
   useEffect(() => {
     const storedUser = sessionStorage.getItem("user");
 
     if (!storedUser) {
-      // Redirect to login if no user data is stored
       navigate("/login");
       return;
     }
 
     const fetchUserDetails = async () => {
       try {
-        const user = JSON.parse(storedUser); // Parse user details from session storage
+        const user = JSON.parse(storedUser);
         const response = await axios.get("http://localhost:3000/en/getuserdata", {
-          params: { _id: user.id }, // Send the user ID to the backend
+          params: { _id: user.id },
         });
-        setDetails(response.data.user); // Store response data in state
-        setCount(response.data.stories);
+
+        const userDetails = response.data.user;
+        const userAchievements = response.data.achievements;
+        const genreCounts = response.data.genreCounts;
+
+        const totalStories = Object.values(genreCounts).reduce((sum, count) => sum + count, 0); // Calculate total
+
+        console.log(userDetails);
+        console.log(userAchievements);
+
+        setDetails({ ...userDetails });
+        setAchievements(userAchievements);
+        setStoryCount(totalStories); // Set total count
+
       } catch (error) {
         console.error("Error fetching user details:", error);
-        navigate("/login"); // Redirect to login on error
+        navigate("/login");
       }
     };
 
@@ -41,11 +47,8 @@ function Profile() {
   }, [navigate]);
 
   if (!details) {
-    // Optionally display a loader or placeholder while fetching data
     return <div>Loading...</div>;
   }
-  
-  
 
   return (
     <div className="max-w-4xl mx-auto">
@@ -73,15 +76,7 @@ function Profile() {
               <BookOpen className="h-6 w-6 text-indigo-600" />
               <div>
                 <p className="text-sm text-gray-500">Stories Created</p>
-                <p className="text-lg font-semibold text-gray-800">{count}</p>
-              </div>
-            </div>
-
-            <div className="flex items-center space-x-3">
-              <Clock className="h-6 w-6 text-indigo-600" />
-              <div>
-                <p className="text-sm text-gray-500">Total Writing Time</p>
-                <p className="text-lg font-semibold text-gray-800">{details.totalWritingTime}</p>
+                <p className="text-lg font-semibold text-gray-800">{storyCount}</p> {/* Display total */}
               </div>
             </div>
 
@@ -101,12 +96,16 @@ function Profile() {
               <h2 className="text-lg font-semibold text-gray-800">Achievements</h2>
             </div>
             <ul className="space-y-3">
-              {details.achievements.map((achievement, index) => (
-                <li key={index} className="flex items-center space-x-2">
-                  <span className="w-2 h-2 bg-indigo-600 rounded-full"></span>
-                  <span className="text-gray-700">{achievement}</span>
-                </li>
-              ))}
+              {achievements.length > 0 ? (
+                achievements.map((achievement, index) => (
+                  <li key={index} className="flex items-center space-x-2">
+                    <span className="w-2 h-2 bg-indigo-600 rounded-full"></span>
+                    <span className="text-gray-700">{achievement}</span>
+                  </li>
+                ))
+              ) : (
+                <li className="text-gray-500">No achievements yet.</li>
+              )}
             </ul>
           </div>
         </div>

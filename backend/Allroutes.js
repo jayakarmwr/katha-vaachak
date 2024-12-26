@@ -1,6 +1,17 @@
 const express = require('express');
 const router = express.Router();
-const {login,signup,confirmPassword,changePassword,getProfile,savestory,storyHistory,getStoryById,setlike,getlikedstories,setdislike}=require("../backend/controllers/get_set");
+const {login,
+    signup,
+    confirmPassword,
+    changePassword,
+    getProfile,
+    savestory,
+    storyHistory,
+    getStoryById,
+    setlike,
+    getlikedstories,
+    setdislike,
+updateuserdata}=require("../backend/controllers/get_set");
 
 
 router.post("/getdata",login);
@@ -14,5 +25,6 @@ router.get("/story-display/:id", getStoryById);
 router.get("/getlikedstories",getlikedstories);
 router.post("/setlike",setlike);
 router.post("/dislike",setdislike);
+router.put("/updateuserdata",updateuserdata);
 
 module.exports=router;

@@ -13,6 +13,7 @@ function CreateStory() {
   const [storyError, setStoryError] = useState("");
   const [imageError, setImageError] = useState("");
   const [isStarred, setIsStarred] = useState(false);
+  const [Title,setTile]=useState("");
 
   const navigate = useNavigate();
 
@@ -24,19 +25,11 @@ function CreateStory() {
     }
   }, []);
 
-  const extractTitleAndPlot = (fullStory) => {
-    const lines = fullStory.split("\n").filter((line) => line.trim() !== "");
-    const title = lines.length > 0 ? lines[0] : "Untitled";
-    const plot = lines.slice(1).join("\n");
-    return { title, plot };
-  };
-
   const handleLikedStories = async () => {
     try {
-      const titleToUse = story.title || extractTitleAndPlot(generatedStory).title;
-      await axios.post("http://localhost:3000/en/setlike", {
+      const response = await axios.post("http://localhost:3000/en/setlike", {
         email,
-        title: titleToUse,
+        title: Title,
       });
       setIsStarred(true);
     } catch (error) {
@@ -52,12 +45,13 @@ function CreateStory() {
 
     try {
       const response = await axios.post(
-        "https://1e53-34-124-189-128.ngrok-free.app/story",
+        "  https://4e9f-35-227-164-215.ngrok-free.app/story",
         story,
         { headers: { "Content-Type": "application/json" }, timeout: 300000 }
       );
 
       if (!response.data.story) throw new Error("Failed to generate story.");
+      console.log(response.data);
       setGeneratedStory(response.data.story);
       const prompts = response.data.prompts;
       setPrompts(prompts);
@@ -75,15 +69,14 @@ function CreateStory() {
       setImages(imageResponse.data.images || []);
 
       if (!imageResponse.data.images) throw new Error("No images generated.");
-
-      const { title, plot } = story.title && story.plot
-        ? { title: story.title, plot: story.plot }
-        : extractTitleAndPlot(response.data.story);
+      const titleMatch = response.data.story.match(/^Title:\s*(.+)$/m);
+      const title = titleMatch ? titleMatch[1] : "Untitled";
+      setTile(title);
 
       const saveData = {
+        ...story,
         genre: story.genre,
         title,
-        plot,
         generatedStory: response.data.story,
         email_id: email,
         images: imageResponse.data.images,
