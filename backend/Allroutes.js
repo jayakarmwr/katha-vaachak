@@ -10,8 +10,7 @@ const {login,
     getStoryById,
     setlike,
     getlikedstories,
-    setdislike,
-updateuserdata}=require("../backend/controllers/get_set");
+    setdislike }=require("../backend/controllers/get_set");
 
 
 router.post("/getdata",login);
@@ -25,6 +24,5 @@ router.get("/story-display/:id", getStoryById);
 router.get("/getlikedstories",getlikedstories);
 router.post("/setlike",setlike);
 router.post("/dislike",setdislike);
-router.put("/updateuserdata",updateuserdata);
 
 module.exports=router;
