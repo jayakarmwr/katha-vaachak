@@ -29,7 +29,7 @@ function CreateStory() {
     try {
       await axios.post("http://localhost:3000/en/setlike", {
         email,
-        title: story.title,
+        title: Title,
       });
       setIsStarred(true);
     } catch (error) {
@@ -51,6 +51,7 @@ function CreateStory() {
       );
 
       if (!response.data.story) throw new Error("Failed to generate story.");
+      console.log(response.data);
       setGeneratedStory(response.data.story);
       const prompts = response.data.prompts;
       setPrompts(prompts);
@@ -68,9 +69,14 @@ function CreateStory() {
       setImages(imageResponse.data.images || []);
       console.log(images)
       if (!imageResponse.data.images) throw new Error("No images generated.");
+      const titleMatch = response.data.story.match(/^Title:\s*(.+)$/m);
+      const title = titleMatch ? titleMatch[1] : "Untitled";
+      setTile(title);
 
       const saveData = {
         ...story,
+        genre: story.genre,
+        title,
         generatedStory: response.data.story,
         email_id: email,
         images: imageResponse.data.images,

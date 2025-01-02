@@ -1,7 +1,7 @@
 const bcrypt=require("bcryptjs");
 const jwt=require("jsonwebtoken");
 const nodemailer=require("nodemailer");
-const {User,Story} =require("../Schema");
+const {User,Story,Feedback} =require("../Schema");
 require('dotenv').config();
 
 
@@ -19,11 +19,12 @@ const login=async(req,res)=>{
         if(!isPasswordValid){
             return res.status(200).json({msg:"Incorrect password"});
         }
-
+        
+        await user.save();
         res.status(200).json({
             msg: "ok",
             id: user._id,
-            username: user.username, 
+            username: user.username,
             });
     }catch(error){
         console.log("Login error:", error);
@@ -147,20 +148,43 @@ const changePassword=async(req,res)=>{
 const getProfile= async (req, res) => {
     const { _id } = req.query;
 
-    if (!_id) {
-      return res.status(400).json({ error: "ID is required" });
+  if (!_id) {
+    return res.status(400).json({ error: "ID is required" });
+  }
+
+  const user = await User.findById(_id);
+  if (!user) {
+    return res.status(404).json({ error: "User not found" });
+  }
+
+  const stories = await Story.find({ userId: user._id }).select('genre');
+  //console.log(stories);
+
+  const genreCounts = {};
+  stories.forEach((story) => {
+    const genre = story.genre.trim(); 
+    if (genre) { 
+      genreCounts[genre] = (genreCounts[genre] || 0) + 1;
     }
-    const user = await User.findById(_id);
-    if (!user) {
-      return res.status(404).json({ error: "User not found" });
+  });
+  //console.log(genreCounts); 
+
+  const achievements = [];
+  for (const [genre, count] of Object.entries(genreCounts)) {
+    if (count >= 2) {  
+      achievements.push(`Master of ${genre}`);
     }
-    const stories=await Story.find({userId:user._id}).countDocuments();
-    res.status(200).json({user,stories});
+  }
+  //console.log(achievements);  
+
+  res.status(200).json({ user, achievements,genreCounts });
   };
 
 
 const savestory = async (req, res) => {
-    const { genre, title, plot, generatedStory, images, email_id } = req.body;
+    const { genre, title, generatedStory, images, email_id } = req.body;
+    console.log(req.body.title);
+    
     try {
         
         const user = await User.findOne({ email: email_id }).select('_id');
@@ -172,7 +196,6 @@ const savestory = async (req, res) => {
             userId: user._id,
             genre,
             title,
-            plot,
             generatedStory,
             images
         });
@@ -197,7 +220,7 @@ const storyHistory = async (req, res) => {
           return res.status(400).json({ message: 'User not found with the provided email' });
       }
 
-    const stories = await Story.find({ userId: user._id });
+    const stories = await Story.find({ userId: user._id }).select('_id genre title');
     res.status(200).json( stories );
   } catch (error) {
     console.error("Error fetching story history:", error);
@@ -239,7 +262,7 @@ const getlikedstories=async(req,res)=>
         if (!id) {
           return res.status(400).json({ message: "User ID is required." });
         }
-        const stories = await Story.find({ userId: id ,liked:true});
+        const stories = await Story.find({ userId: id ,liked:true}).select('_id genre title');
         //console.log(stories);
     
         
@@ -275,9 +298,9 @@ const getlikedstories=async(req,res)=>
   }
   
   const getStoryById = async (req, res) => {
-    const { id } = req.params; // Extract the story ID from the request parameters
+    const { id } = req.params; 
     try {
-      const story = await Story.findById(id); // Find the story by its ID
+      const story = await Story.findById(id); 
       if (!story) {
         return res.status(404).json({ message: "Story not found" });
       }
@@ -288,5 +311,29 @@ const getlikedstories=async(req,res)=>
     }
   };
 
-module.exports={login,signup,confirmPassword,changePassword,getProfile,savestory,storyHistory,getStoryById,setlike,getlikedstories,setdislike};
+
+  const submitFeedback = async (req, res) => {
+    const { email, feedback, rating } = req.body;
+
+    if (!feedback) {
+      return res.status(400).json({ msg: "Email and feedback are required." });
+    }
+
+    try {
+    // Save feedback to the database
+      const newFeedback = new Feedback({
+        email,
+        feedback,
+        rating, // Optional: Include rating if provided
+      });
+
+      await newFeedback.save();
+      res.status(200).json({ msg: "Feedback submitted successfully." });
+    } catch (error) {
+      console.error("Error submitting feedback:", error);
+      res.status(500).json({ msg: "Server error." });
+    }
+  };
+
+module.exports={login,signup,confirmPassword,changePassword,getProfile,savestory,storyHistory,getStoryById,setlike,getlikedstories,setdislike,submitFeedback};
   

@@ -17,7 +17,7 @@ const storySchema = new mongoose.Schema({
     userId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
     genre: { type: String, required: true },
     title: { type: String, required: true },
-    plot: { type: String, required: true },
+    //plot: { type: String, required: true },
     generatedStory: { type: String, required: true },
     images: { type: [String], required: false },
     createdAt: { type: Date, default: Date.now },
@@ -25,7 +25,19 @@ const storySchema = new mongoose.Schema({
 
 });
 
+
+const feedbackSchema = new mongoose.Schema({
+    email: { type: String, required: true }, // Email field added
+    feedback: { type: String, required: true },
+    rating: { type: Number, min: 1, max: 5 }, // Optional: Rating 1-5
+    createdAt: { type: Date, default: Date.now },
+  });
+
 const Story = mongoose.model('Story', storySchema);
 
 const User = mongoose.model('User', userSchema);
-module.exports = { User,Story };
+
+const Feedback=mongoose.model('Feedback',feedbackSchema);
+
+
+module.exports = { User,Story,Feedback };
