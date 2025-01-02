@@ -30,7 +30,9 @@ def generate_images():
             return jsonify({"error": "No prompts provided"}), 400
         
         images = []
+        count=0
         for prompt in prompts:
+            count=count+1
             image_bytes = query(prompt)
             image = Image.open(io.BytesIO(image_bytes))
             buffer = io.BytesIO()
@@ -38,7 +40,7 @@ def generate_images():
             buffer.seek(0)
             image_base64 = base64.b64encode(buffer.read()).decode('utf-8')
             images.append(image_base64)
-        print()
+            print(count)
         return jsonify({"images": images})
     except Exception as e:
         return jsonify({"error": str(e)}), 500

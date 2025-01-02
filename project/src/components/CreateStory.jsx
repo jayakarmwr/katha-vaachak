@@ -13,6 +13,7 @@ function CreateStory() {
   const [storyError, setStoryError] = useState("");
   const [imageError, setImageError] = useState("");
   const [isStarred, setIsStarred] = useState(false);
+  const [reading, setReading] = useState(false);
 
   const navigate = useNavigate();
 
@@ -26,7 +27,7 @@ function CreateStory() {
 
   const handleLikedStories = async () => {
     try {
-      const response = await axios.post("http://localhost:3000/en/setlike", {
+      await axios.post("http://localhost:3000/en/setlike", {
         email,
         title: story.title,
       });
@@ -44,7 +45,7 @@ function CreateStory() {
 
     try {
       const response = await axios.post(
-        "https://1e53-34-124-189-128.ngrok-free.app/story",
+        "https://1b2c-34-145-25-97.ngrok-free.app/story",
         story,
         { headers: { "Content-Type": "application/json" }, timeout: 300000 }
       );
@@ -65,7 +66,7 @@ function CreateStory() {
       );
 
       setImages(imageResponse.data.images || []);
-
+      console.log(images)
       if (!imageResponse.data.images) throw new Error("No images generated.");
 
       const saveData = {
@@ -97,24 +98,22 @@ function CreateStory() {
   const renderStoryWithImages = () => {
     const storySegments = generatedStory.split("\n\n").filter((seg) => seg.trim() !== ""); // Split into paragraphs, ignoring empty lines
     const totalSegments = storySegments.length;
-    const totalImages = images.length;
-  
-    // Calculate interval to insert images
-    const interval = Math.ceil(totalSegments / (totalImages || 1));
-  
+    const totalImages = images.length; // Use the actual length of images
+    const interval = Math.ceil(totalSegments / totalImages);
+    console.log(totalImages)
     const content = [];
-  
+    let imageIndex=""
     storySegments.forEach((segment, index) => {
-      // Add the story text
+      // Add story text
       content.push(
         <p key={`story-segment-${index}`} className="text-gray-700 whitespace-pre-line mb-4">
           {segment}
         </p>
       );
   
-      // Insert an image after every `interval` segments
-      if ((index + 1) % interval === 0 && Math.floor(index / interval) < totalImages) {
-        const imageIndex = Math.floor(index / interval);
+      // Add image when necessary
+      imageIndex = Math.floor(index / interval);
+      if (imageIndex < totalImages && (index + 1) % interval === 0) {
         content.push(
           <div
             key={`image-${imageIndex}`}
@@ -125,16 +124,18 @@ function CreateStory() {
               alt={`Generated Story Image ${imageIndex + 1}`}
               className="max-w-full max-h-72 object-contain rounded-lg shadow-md"
             />
+            {console.log(imageIndex)}
           </div>
         );
       }
     });
   
-    // Add any remaining images after the story content
-    for (let i = Math.ceil(totalSegments / interval); i < totalImages; i++) {
+    // Append any remaining images if they weren't displayed
+    for (let i = imageIndex; i < totalImages; i++) {
+      if(i==2) continue;
       content.push(
         <div
-          key={`image-extra-${i}`}
+          key={`extra-image-${i}`}
           className="flex justify-center items-center mb-4"
         >
           <img
@@ -142,6 +143,7 @@ function CreateStory() {
             alt={`Generated Story Image ${i + 1}`}
             className="max-w-full max-h-72 object-contain rounded-lg shadow-md"
           />
+          {console.log(i)}
         </div>
       );
     }
@@ -149,7 +151,31 @@ function CreateStory() {
     return content;
   };
   
-  
+
+  const handleReadStory = () => {
+    if (!generatedStory) return;
+
+    const utterance = new SpeechSynthesisUtterance(generatedStory);
+    utterance.lang = "en-US";
+    utterance.rate = 1;
+    utterance.onstart = () => setReading(true);
+    utterance.onend = () => setReading(false);
+    window.speechSynthesis.speak(utterance);
+  };
+
+  const handlePause = () => {
+    if (reading) {
+      window.speechSynthesis.pause();
+      setReading(false);
+    }
+  };
+
+  const handlePlay = () => {
+    if (!reading) {
+      window.speechSynthesis.resume();
+      setReading(true);
+    }
+  };
 
   return (
     <div className="max-w-4xl mx-auto">
@@ -222,6 +248,26 @@ function CreateStory() {
                 className={isStarred ? "text-yellow-400" : "text-gray-400"}
               />
             </button>
+            <div className="mt-4 flex space-x-4">
+              <button
+                onClick={handleReadStory}
+                className="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-lg"
+              >
+                Read Story
+              </button>
+              <button
+                onClick={handlePause}
+                className="bg-yellow-500 hover:bg-yellow-600 text-white py-2 px-4 rounded-lg"
+              >
+                Pause
+              </button>
+              <button
+                onClick={handlePlay}
+                className="bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded-lg"
+              >
+                Play
+              </button>
+            </div>
           </div>
         )}
 
