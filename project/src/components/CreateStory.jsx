@@ -14,6 +14,7 @@ function CreateStory() {
   const [imageError, setImageError] = useState("");
   const [isStarred, setIsStarred] = useState(false);
   const [reading, setReading] = useState(false);
+  const [Title,setTile]=useState("");
 
   const navigate = useNavigate();
 
@@ -45,7 +46,7 @@ function CreateStory() {
 
     try {
       const response = await axios.post(
-        "https://1b2c-34-145-25-97.ngrok-free.app/story",
+        "https://7c5c-34-91-202-172.ngrok-free.app/story",
         story,
         { headers: { "Content-Type": "application/json" }, timeout: 300000 }
       );
@@ -130,7 +131,7 @@ function CreateStory() {
               alt={`Generated Story Image ${imageIndex + 1}`}
               className="max-w-full max-h-72 object-contain rounded-lg shadow-md"
             />
-            {console.log(imageIndex)}
+            {console.log(imageIndex+"-")}
           </div>
         );
       }
@@ -138,18 +139,18 @@ function CreateStory() {
   
     // Append any remaining images if they weren't displayed
     for (let i = imageIndex; i < totalImages; i++) {
-      if(i==2) continue;
+      {console.log(i)}
+      // if(i==2) continue;
       content.push(
         <div
           key={`extra-image-${i}`}
           className="flex justify-center items-center mb-4"
-        >
+        > 
           <img
             src={`data:image/png;base64,${images[i]}`}
             alt={`Generated Story Image ${i + 1}`}
             className="max-w-full max-h-72 object-contain rounded-lg shadow-md"
           />
-          {console.log(i)}
         </div>
       );
     }
