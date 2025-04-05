@@ -11,14 +11,16 @@ CORS(app)  # Enable CORS for all routes
 # CORS(app, origins=["http://localhost:5173"])
 
 API_URL = "https://api-inference.huggingface.co/models/ZB-Tech/Text-to-Image"
-headers = {"Authorization": "Bearer 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"}
+headers = {"Authorization": "Bearer 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"}
 
 def query(prompt):
     response = requests.post(API_URL, headers=headers, json={"inputs": prompt})
     if response.status_code == 200:
         return response.content
     else:
-        raise Exception(f"API Error: {response.status_code} - {response.text}")
+        print("API Error:", response.status_code, response.text)
+        raise Exception(f"Hugging Face API returned error {response.status_code}")
+
 
 @app.route('/generate-images', methods=['POST'])
 def generate_images():
