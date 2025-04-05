@@ -70,7 +70,7 @@ function CreateStory() {
     
     try {
       const response = await axios.post(
-        "https://115c-34-125-149-83.ngrok-free.app/story",
+        "https://c6a4-34-125-112-82.ngrok-free.app/story",
         story,
         { headers: { "Content-Type": "application/json" }, timeout: 300000 }
       );

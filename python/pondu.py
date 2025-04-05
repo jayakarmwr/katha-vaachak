@@ -18,7 +18,9 @@ def query(prompt):
     if response.status_code == 200:
         return response.content
     else:
-        raise Exception(f"API Error: {response.status_code} - {response.text}")
+        print("API Error:", response.status_code, response.text)
+        raise Exception(f"Hugging Face API returned error {response.status_code}")
+
 
 @app.route('/generate-images', methods=['POST'])
 def generate_images():
