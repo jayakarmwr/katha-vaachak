@@ -1,24 +1,22 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import { FaStar } from "react-icons/fa";
+import { FaStar } from "react-icons/fa"; // Import FontAwesome star icon
 
 function CreateStory() {
   const [email, setEmail] = useState("");
   const [story, setStory] = useState({ genre: "", title: "", plot: "" });
   const [generatedStory, setGeneratedStory] = useState("");
-  const [translatedStory, setTranslatedStory] = useState("");
-  const [selectedLanguage, setSelectedLanguage] = useState("en");
+  const [images, setImages] = useState([]);
   const [prompts, setPrompts] = useState([]);
+  const [loading, setLoading] = useState(false);
   const [storyError, setStoryError] = useState("");
   const [imageError, setImageError] = useState("");
-  const [images, setImages] = useState([]);
-  const [loading, setLoading] = useState(false);
   const [isStarred, setIsStarred] = useState(false);
   const [reading, setReading] = useState(false);
-  const navigate = useNavigate();
-  const [Title, setTitle] = useState("");
+  const [Title,setTile]=useState("");
 
+  const navigate = useNavigate();
 
   useEffect(() => {
     const storedData = sessionStorage.getItem("user");
@@ -40,52 +38,28 @@ function CreateStory() {
     }
   };
 
-
-  const translateStory = async (text, lang) => {
-    try {
-      const chunkSize = 500; // Maximum allowed characters per request
-      const chunks = text.match(new RegExp(`.{1,${chunkSize}}`, 'g')); // Split text into chunks
-  
-      const translatedChunks = await Promise.all(
-        chunks.map(async (chunk) => {
-          const response = await axios.get("https://api.mymemory.translated.net/get", {
-            params: { q: chunk, langpair: `en|${lang}` },
-          });
-          console.log(response.data);
-          return response.data.responseData.translatedText; 
-        })
-      );
-  
-      return translatedChunks.join(" "); // Join translated chunks
-    } catch (error) {
-      console.error("Translation error:", error);
-      return text;
-    }
-  };
-  
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    
+    setStoryError("");
+    setImageError("");
+
     try {
       const response = await axios.post(
-        "https://c6a4-34-125-112-82.ngrok-free.app/story",
+        "https://115c-34-125-149-83.ngrok-free.app/story",
         story,
         { headers: { "Content-Type": "application/json" }, timeout: 300000 }
       );
-      
+
       if (!response.data.story) throw new Error("Failed to generate story.");
       console.log(response.data);
       setGeneratedStory(response.data.story);
       const prompts = response.data.prompts;
       setPrompts(prompts);
+
       if (!response.data.prompts || response.data.prompts.length === 0) {
         throw new Error("No prompts returned for image generation.");
       }
-      const translated = await translateStory(response.data.story, selectedLanguage);
-      setTranslatedStory(translated);
-      console.log("Translated Story:", translated);
 
       const imageResponse = await axios.post(
         "http://127.0.0.1:5000/generate-images",
@@ -96,19 +70,18 @@ function CreateStory() {
       setImages(imageResponse.data.images || []);
       console.log(images)
       if (!imageResponse.data.images) throw new Error("No images generated.");
-      const titleMatch = response.data.story.match(/Title:\s*(.+)/i);
+      const titleMatch = response.data.story.match(/^Title:\s*(.+)$/m);
       const title = titleMatch ? titleMatch[1] : "Untitled";
-      setTitle(title);
-      
+      setTile(title);
+
       const saveData = {
         ...story,
         genre: story.genre,
         title,
-        generatedStory: translated,
+        generatedStory: response.data.story,
         email_id: email,
         images: imageResponse.data.images,
       };
-
 
       await axios.post("http://localhost:3000/en/save-story", saveData, {
         headers: { "Content-Type": "application/json" },
@@ -129,9 +102,8 @@ function CreateStory() {
     }
   };
 
-
   const renderStoryWithImages = () => {
-    const storySegments = translatedStory.split("\n\n").filter((seg) => seg.trim() !== ""); // Split into paragraphs, ignoring empty lines
+    const storySegments = generatedStory.split("\n\n").filter((seg) => seg.trim() !== ""); // Split into paragraphs, ignoring empty lines
     const totalSegments = storySegments.length;
     const totalImages = images.length; // Use the actual length of images
     const interval = Math.ceil(totalSegments / totalImages);
@@ -145,27 +117,27 @@ function CreateStory() {
           {segment}
         </p>
       );
-
-        // Add image when necessary
-        imageIndex = Math.floor(index / interval);
-        if (imageIndex < totalImages && (index + 1) % interval === 0) {
-          content.push(
-            <div
-              key={`image-${imageIndex}`}
-              className="flex justify-center items-center mb-4"
-            >
-              <img
-                src={`data:image/png;base64,${images[imageIndex]}`}
-                alt={`Generated Story Image ${imageIndex + 1}`}
-                className="max-w-full max-h-72 object-contain rounded-lg shadow-md"
-              />
-              {console.log(imageIndex+"-")}
-            </div>
-          );
-        }
-      });
-
-          // Append any remaining images if they weren't displayed
+  
+      // Add image when necessary
+      imageIndex = Math.floor(index / interval);
+      if (imageIndex < totalImages && (index + 1) % interval === 0) {
+        content.push(
+          <div
+            key={`image-${imageIndex}`}
+            className="flex justify-center items-center mb-4"
+          >
+            <img
+              src={`data:image/png;base64,${images[imageIndex]}`}
+              alt={`Generated Story Image ${imageIndex + 1}`}
+              className="max-w-full max-h-72 object-contain rounded-lg shadow-md"
+            />
+            {console.log(imageIndex+"-")}
+          </div>
+        );
+      }
+    });
+  
+    // Append any remaining images if they weren't displayed
     for (let i = imageIndex; i < totalImages; i++) {
       {console.log(i)}
       // if(i==2) continue;
@@ -185,30 +157,18 @@ function CreateStory() {
   
     return content;
   };
+  
 
   const handleReadStory = () => {
-    if (!translatedStory || !translatedStory.trim()) return;
-  
-    window.speechSynthesis.cancel(); // Stop any ongoing speech
-  
-    const utterance = new SpeechSynthesisUtterance(translatedStory);
-  
-    // Language selection using an object for efficiency
-    const languageMap = {
-      hi: "hi-IN",
-      en: "en-US",
-      es: "es-ES",
-      fr: "fr-FR",
-      de: "de-DE"
-    };
-    utterance.lang = languageMap[selectedLanguage] || "en-US"; // Default to English
-  
+    if (!generatedStory) return;
+
+    const utterance = new SpeechSynthesisUtterance(generatedStory);
+    utterance.lang = "en-US";
     utterance.rate = 1;
     utterance.onstart = () => setReading(true);
     utterance.onend = () => setReading(false);
-    setReading(true);
     window.speechSynthesis.speak(utterance);
-  };  
+  };
 
   const handlePause = () => {
     if (reading) {
@@ -223,14 +183,14 @@ function CreateStory() {
       setReading(true);
     }
   };
-  
-  
+
   return (
     <div className="max-w-4xl mx-auto">
       <div className="bg-white rounded-xl shadow-xl p-8">
         <h1 className="text-3xl font-bold text-gray-800 mb-8">Create Your Story</h1>
+
         <form onSubmit={handleSubmit} className="space-y-6">
-        <div>
+          <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Genre
             </label>
@@ -268,20 +228,6 @@ function CreateStory() {
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Language</label>
-            <select
-              value={selectedLanguage}
-              onChange={(e) => setSelectedLanguage(e.target.value)}
-              className="w-full px-4 py-2 border rounded-lg"
-            >
-              <option value="en">English</option>
-              <option value="es">Spanish</option>
-              <option value="fr">French</option>
-              <option value="de">German</option>
-              <option value="hi">Hindi</option>
-            </select>
-          </div>
-          <div>
             <button
               type="submit"
               disabled={loading}
@@ -295,7 +241,8 @@ function CreateStory() {
             </button>
           </div>
         </form>
-        {translatedStory && (
+
+        {generatedStory && (
           <div className="mt-8 bg-gray-50 p-6 rounded-lg shadow-md relative">
             <h2 className="text-2xl font-bold text-gray-800 mb-4">Generated Story</h2>
             {renderStoryWithImages()}
@@ -319,7 +266,7 @@ function CreateStory() {
                 onClick={handlePause}
                 className="bg-yellow-500 hover:bg-yellow-600 text-white py-2 px-4 rounded-lg"
               >
-                 Pause
+                Pause
               </button>
               <button
                 onClick={handlePlay}
@@ -331,10 +278,9 @@ function CreateStory() {
           </div>
         )}
 
-      {storyError && <p className="text-red-500 mt-4">{storyError}</p>}
+        {storyError && <p className="text-red-500 mt-4">{storyError}</p>}
 
-      {imageError && <p className="text-red-500 mt-4">{imageError}</p>}
-
+        {imageError && <p className="text-red-500 mt-4">{imageError}</p>}
       </div>
     </div>
   );
